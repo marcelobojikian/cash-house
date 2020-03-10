@@ -13,4 +13,7 @@ the backend was made in react-native
  <img src="images/deposit.png" width="150" height="300">
 </p>
 
+## License
+
+All code in this repository is under the MIT license as specified by the LICENSE file.
 
