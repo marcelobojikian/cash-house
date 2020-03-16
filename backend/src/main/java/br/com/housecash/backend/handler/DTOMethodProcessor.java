@@ -33,12 +33,6 @@ public class DTOMethodProcessor extends RequestResponseBodyMethodProcessor {
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(RequestDTO.class);
     }
-
-//     uncomment to force validate
-//    @Override
-//    protected void validateIfApplicable(WebDataBinder binder, MethodParameter parameter) {
-//        binder.validate();
-//    }
     
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {

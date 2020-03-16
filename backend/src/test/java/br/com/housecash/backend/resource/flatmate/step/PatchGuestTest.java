@@ -1,4 +1,4 @@
-package br.com.housecash.backend.resource.flatmate;
+package br.com.housecash.backend.resource.flatmate.step;
 
 import static br.com.housecash.backend.resource.SecurityAccess.User.JEAN;
 import static org.hamcrest.Matchers.is;
@@ -21,23 +21,18 @@ import br.com.housecash.backend.resource.Oauth2;
 @WebAppConfiguration
 @SpringBootTest(classes = App.class)
 @Sql("classpath:reset.sql")
-public class PatchTest extends Oauth2 {
+public class PatchGuestTest extends Oauth2 {
 
 	@Test
-	public void patch_nickname_OK() throws Exception {
+	public void patch_nickname_NOT_password_OK() throws Exception {
 		
 		loginWith(JEAN);
 
 		// @formatter:off
 		body().add("nickname", "Jean (test UPDATE)");
 
-		patch("/flatmates/8")
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(8)))
-				.andExpect(jsonPath("$.email", is("jean@mail.com")))
-				.andExpect(jsonPath("$.nickname", is("Jean (test UPDATE)")))
-				.andExpect(jsonPath("$.password").doesNotExist());
+		patch("/flatmates/8/step/guest")
+				.andExpect(status().isBadRequest());
         // @formatter:on
 
 	}
@@ -52,7 +47,7 @@ public class PatchTest extends Oauth2 {
 			.add("nickname", "Jean (test UPDATE)")
 			.add("password", "test123");
 
-		patch("/flatmates/8")
+		patch("/flatmates/8/step/guest")
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", is(8)))
@@ -64,43 +59,17 @@ public class PatchTest extends Oauth2 {
 	}
 
 	@Test
-	public void patch_invalid_id_Forbidden() throws Exception {
+	public void patch_other_user_Forbidden() throws Exception {
 		
 		loginWith(JEAN);
 
 		// @formatter:off
-		body().add("nickname", "Jean (test UPDATE)");
+		body()
+			.add("nickname", "Jean (test UPDATE)")
+			.add("password", "test123");
 
-		patch("/flatmates/999")
+		patch("/flatmates/3/step/guest")
 				.andExpect(status().isForbidden());
-        // @formatter:on
-
-	}
-
-	@Test
-	public void patch_nickname_Forbidden() throws Exception {
-		
-		loginWith(JEAN);
-
-		// @formatter:off
-		body().add("nickname", "Gretchen (test UPDATE)");
-
-		patch("/flatmates/9")
-				.andExpect(status().isForbidden());
-        // @formatter:on
-
-	}
-
-	@Test
-	public void patch_email_MethodNotAllowed() throws Exception {
-		
-		loginWith(JEAN);
-
-		// @formatter:off
-		body().add("email", "test@othermail.com");
-
-		patch("/flatmates/8")
-				.andExpect(status().isBadRequest());
         // @formatter:on
 
 	}

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.exception.InvalidFieldException;
 import br.com.housecash.backend.exception.NoContentException;
-import br.com.housecash.backend.handler.annotation.ObjDashboard;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
@@ -38,19 +37,19 @@ public class CashierController {
 	private CashierService cashierService; 
 
 	@GetMapping("")
-	public List<Cashier> findAll(@ObjDashboard Dashboard dashboard) {
+	public List<Cashier> findAll(Dashboard dashboard) {
 		return cashierService.findAll(dashboard);
 	}
 
 	@GetMapping("/{id}")
-	public Cashier findById(@ObjDashboard Dashboard dashboard, @PathVariable Long id) {
+	public Cashier findById(Dashboard dashboard, @PathVariable Long id) {
 		return cashierService.findById(dashboard, id);
 	}
 
 	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cashier create(
-			@ObjDashboard Dashboard dashboard, 
+			Dashboard dashboard, 
 			@RequestDTO(CreateCashier.class) @Valid Cashier cashier) {
 		
 		String name = cashier.getName();
@@ -67,7 +66,7 @@ public class CashierController {
 
 	@PutMapping("/{id}")
 	public Cashier update(
-			@ObjDashboard Dashboard dashboard, 
+			Dashboard dashboard, 
 			@PathVariable Long id, 
 			@RequestBody Cashier cashier) {
 		return cashierService.update(dashboard, id, cashier);
@@ -75,7 +74,7 @@ public class CashierController {
 
 	@PatchMapping("/{id}")
 	public Cashier patch(
-			@ObjDashboard Dashboard dashboard, 
+			Dashboard dashboard, 
 			@PathVariable Long id,
 			@RequestBody Map<String, String> update) throws Exception {
 		

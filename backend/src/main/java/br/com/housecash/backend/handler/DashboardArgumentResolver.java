@@ -14,8 +14,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import br.com.housecash.backend.exception.AccessDeniedException;
-import br.com.housecash.backend.exception.InvalidFieldException;
-import br.com.housecash.backend.handler.annotation.ObjDashboard;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.service.DashboardService;
@@ -38,7 +36,7 @@ public class DashboardArgumentResolver implements HandlerMethodArgumentResolver 
 
 	@Override
 	public boolean supportsParameter(MethodParameter methodParameter) {
-		return methodParameter.getParameterAnnotation(ObjDashboard.class) != null;
+		return methodParameter.getParameterType().equals(Dashboard.class);
 	}
 
 	@Override
