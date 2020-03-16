@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.exception.NoContentException;
-import br.com.housecash.backend.handler.annotation.ObjDashboard;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
@@ -65,13 +64,13 @@ public class TransactionController {
 	private TransactionRepository repository;
 
 	@GetMapping("")
-	public List<Transaction> findAll(@ObjDashboard Dashboard dashboard) {
+	public List<Transaction> findAll(Dashboard dashboard) {
 		return transactionService.findAll(dashboard);
 	}
 
 	@GetMapping("/group")
 	public List<Content<Transaction>> findAllGroupByDate(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@RequestParam Map<String,String> parameters) {
 		
 		Collection<Transaction> transactions = transactionService.findAll(dashboard, parameters);
@@ -89,7 +88,7 @@ public class TransactionController {
 
 	@GetMapping("/group/paged")
 	public List<Content<Transaction>> findAllGroupByDateAndPaged(
-			@ObjDashboard Dashboard dashboard, Pageable pageable) {
+			Dashboard dashboard, Pageable pageable) {
 		
 		Page<Transaction> pages = transactionService.findAll(dashboard, pageable);
 		
@@ -107,7 +106,7 @@ public class TransactionController {
 	@GetMapping("/group/paged/assembler")
 	public Object findAllGroupDate(
 			@UserLogged Flatmate flatmateLogged,
-			@ObjDashboard Dashboard dashboard, 
+			Dashboard dashboard, 
 			Pageable pageable, 
 			PagedResourcesAssembler<Content<Transaction>> assembler) {
 		
@@ -128,14 +127,14 @@ public class TransactionController {
 	}
 
 	@GetMapping("/{id}")
-	public Transaction findOne(@ObjDashboard Dashboard dashboard, @PathVariable Long id) {
+	public Transaction findOne(Dashboard dashboard, @PathVariable Long id) {
 		return transactionService.findById(dashboard, id);
 	}
 
 	@PostMapping("/deposit")
 	@ResponseStatus(HttpStatus.CREATED)
 	public Transaction createDepoist(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
@@ -155,7 +154,7 @@ public class TransactionController {
 	@PostMapping("/withdraw")
 	@ResponseStatus(HttpStatus.CREATED)
 	public Transaction createWithdraw(
-			@ObjDashboard Dashboard dashboard, 
+			Dashboard dashboard, 
 			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
@@ -174,7 +173,7 @@ public class TransactionController {
 
 	@PutMapping("/{id}")
 	public Transaction update(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@PathVariable Long id, 
 			@RequestBody Transaction transaction) {
 		return transactionService.update(dashboard, id, transaction);
@@ -183,7 +182,7 @@ public class TransactionController {
 	@PatchMapping("/{id}")
 //	@Transactional // Not necesary, spring.jpa.open-in-view is TRUE by default
 	public Transaction patch(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@PathVariable @NotNull Long id,
 			@RequestDTO(UpdateTransaction.class) @Valid UpdateTransaction content) {
 		

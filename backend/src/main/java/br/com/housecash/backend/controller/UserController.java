@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.housecash.backend.handler.annotation.ObjDashboard;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.security.annotation.UserLogged;
 import br.com.housecash.backend.service.DashboardService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users/self")
 @PreAuthorize("hasAnyRole('USER')")
 public class UserController {
 
@@ -28,7 +27,7 @@ public class UserController {
 	}
 
 	@GetMapping("/dashboard")
-	public Dashboard getDashboard(@ObjDashboard Dashboard dashboard) {
+	public Dashboard getDashboard(Dashboard dashboard) {
 		return dashboard;
 	}
 

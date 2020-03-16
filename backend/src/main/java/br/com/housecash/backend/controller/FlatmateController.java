@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.exception.InvalidFieldException;
-import br.com.housecash.backend.handler.annotation.ObjDashboard;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
@@ -36,19 +35,19 @@ public class FlatmateController {
 	private FlatmateService flatmateService;
 
 	@GetMapping("")
-	public List<Flatmate> findAll(@ObjDashboard Dashboard dashboard) {
+	public List<Flatmate> findAll(Dashboard dashboard) {
 		return flatmateService.findAll(dashboard);
 	}
 
 	@GetMapping("/{id}")
-	public Flatmate findById(@ObjDashboard Dashboard dashboard, @PathVariable Long id) {
+	public Flatmate findById(Dashboard dashboard, @PathVariable Long id) {
 		return flatmateService.findById(dashboard, id);
 	}
 
 	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
 	public Flatmate create(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@RequestDTO(CreateFlatmate.class) @Valid Flatmate flatmate) {
 		
 		String email = flatmate.getEmail();
@@ -70,7 +69,7 @@ public class FlatmateController {
 
 	@PatchMapping("/{id}")
 	public Flatmate patch(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@PathVariable Long id,
 			@RequestBody Map<String, String> update) {
 
@@ -93,13 +92,14 @@ public class FlatmateController {
 
 	@PatchMapping("/{id}/step/guest")
 	public Flatmate setpGuestCompleted(
-			@ObjDashboard Dashboard dashboard,
+			Dashboard dashboard,
 			@PathVariable Long id,
 			@RequestBody Map<String, String> update) {
 
 		String nickname = update.get("nickname");
 		String password = update.get("password");
-		if (!StringUtils.isEmpty(nickname) && !StringUtils.isEmpty(nickname)) {
+		
+		if (!StringUtils.isEmpty(nickname) && !StringUtils.isEmpty(password)) {
 			return flatmateService.updateGuest(id, nickname, password);
 		} else {
 			throw new InvalidFieldException(update.keySet());
