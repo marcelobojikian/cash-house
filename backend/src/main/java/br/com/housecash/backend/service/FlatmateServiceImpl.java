@@ -41,28 +41,10 @@ public class FlatmateServiceImpl implements FlatmateService {
 		
 	}
 
-//	@Override
-//	public Optional<Flatmate> findByEmail(String email) {
-//		return flatmateRepository.findByEmail(email);
-//	}
-
 	@Override
 	public List<Flatmate> findAll(Dashboard dashboard) {
 		return dashboard.getGuests();
 	}
-
-//	@Override
-//	public void register(String email, String password) {
-//		
-//		String cryptPassword = bCryptPasswordEncoder.encode(password);
-//		
-//		Flatmate user = new Flatmate(email,cryptPassword);
-//		user.setRoles("USER");
-//
-//		System.out.println("\n%%%%%%%%%%%      Adding New User.... " + user.getNickname() + "     %%%%%%%%%%%%%\n");
-//		flatmateRepository.save(user);
-//		
-//	}
 
 	@Override
 	public Flatmate create(Dashboard dashboard, String email, String nickname, String password) {
@@ -166,11 +148,6 @@ public class FlatmateServiceImpl implements FlatmateService {
 			
 		}).orElseThrow(() ->  new EntityNotFoundException(Flatmate.class, id) );
 		
-	}
-
-	@Override
-	public void deleteFlatmateById(long id) {
-		flatmateRepository.deleteById(id);
 	}
 
 }

@@ -30,7 +30,7 @@ public class PatchTest extends Oauth2 {
 		loginWith(JEAN);
 		
 		patch("/cashiers/3", "{}")
-				.andExpect(status().isNoContent());
+				.andExpect(status().isBadRequest());
         // @formatter:on
 
 	}

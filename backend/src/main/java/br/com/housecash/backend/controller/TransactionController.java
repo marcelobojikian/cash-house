@@ -19,7 +19,6 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,15 +39,17 @@ import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.dto.Content;
 import br.com.housecash.backend.model.dto.CreateTransaction;
 import br.com.housecash.backend.model.dto.UpdateTransaction;
-import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.security.annotation.UserLogged;
 import br.com.housecash.backend.service.CashierService;
 import br.com.housecash.backend.service.FlatmateService;
 import br.com.housecash.backend.service.TransactionService;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/transactions")
 @PreAuthorize("hasAnyRole('USER')")
+// TODO Teste de integracao imcompleto.
 public class TransactionController {
 
 	@Autowired
@@ -60,17 +61,15 @@ public class TransactionController {
 	@Autowired
 	private TransactionService transactionService;
 
-	@Autowired
-	private TransactionRepository repository;
-
 	@GetMapping("")
-	public List<Transaction> findAll(Dashboard dashboard) {
+	@ApiOperation(value = "Return a list with all transactions", response = Transaction[].class)
+	public List<Transaction> findAll(@ApiIgnore Dashboard dashboard) {
 		return transactionService.findAll(dashboard);
 	}
 
 	@GetMapping("/group")
 	public List<Content<Transaction>> findAllGroupByDate(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@RequestParam Map<String,String> parameters) {
 		
 		Collection<Transaction> transactions = transactionService.findAll(dashboard, parameters);
@@ -88,7 +87,7 @@ public class TransactionController {
 
 	@GetMapping("/group/paged")
 	public List<Content<Transaction>> findAllGroupByDateAndPaged(
-			Dashboard dashboard, Pageable pageable) {
+			@ApiIgnore Dashboard dashboard, Pageable pageable) {
 		
 		Page<Transaction> pages = transactionService.findAll(dashboard, pageable);
 		
@@ -106,7 +105,7 @@ public class TransactionController {
 	@GetMapping("/group/paged/assembler")
 	public Object findAllGroupDate(
 			@UserLogged Flatmate flatmateLogged,
-			Dashboard dashboard, 
+			@ApiIgnore Dashboard dashboard, 
 			Pageable pageable, 
 			PagedResourcesAssembler<Content<Transaction>> assembler) {
 		
@@ -127,14 +126,16 @@ public class TransactionController {
 	}
 
 	@GetMapping("/{id}")
-	public Transaction findOne(Dashboard dashboard, @PathVariable Long id) {
+	@ApiOperation(value = "Return a transaction entity by id", response = Transaction.class)
+	public Transaction findOne(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
 		return transactionService.findById(dashboard, id);
 	}
 
 	@PostMapping("/deposit")
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Returns a created deposit transaction entity", response = Transaction.class)
 	public Transaction createDepoist(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
@@ -153,8 +154,9 @@ public class TransactionController {
 
 	@PostMapping("/withdraw")
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Returns a created withdraw transaction entity", response = Transaction.class)
 	public Transaction createWithdraw(
-			Dashboard dashboard, 
+			@ApiIgnore Dashboard dashboard, 
 			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
@@ -172,17 +174,18 @@ public class TransactionController {
 	}
 
 	@PutMapping("/{id}")
+	@ApiOperation(value = "Return a transaction entity updated", response = Transaction.class)
 	public Transaction update(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@PathVariable Long id, 
 			@RequestBody Transaction transaction) {
 		return transactionService.update(dashboard, id, transaction);
 	}
 
 	@PatchMapping("/{id}")
-//	@Transactional // Not necesary, spring.jpa.open-in-view is TRUE by default
+	@ApiOperation(value = "Return a transaction entity partial updated", response = Transaction.class)
 	public Transaction patch(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@PathVariable @NotNull Long id,
 			@RequestDTO(UpdateTransaction.class) @Valid UpdateTransaction content) {
 		
@@ -208,11 +211,6 @@ public class TransactionController {
 		
 		return transactionService.findById(dashboard, id);
 
-	}
-
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
-		repository.deleteById(id);
 	}
 
 }
