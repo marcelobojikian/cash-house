@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
@@ -19,6 +20,9 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
 	
 	@Query("SELECT t FROM Transaction t WHERE t IN :#{#dashboard.transactions}")
 	public Collection<Transaction> findByDashboard(@Param("dashboard") Dashboard dashboard);
+	
+	@Query("SELECT t FROM Transaction t WHERE t IN :#{#dashboard.transactions} AND t.cashier = :cashier")
+	public Collection<Transaction> findByDashboardAndCashier(@Param("dashboard") Dashboard dashboard, @Param("cashier") Cashier cashier);
 	
 	@Query("SELECT t FROM Transaction t WHERE t IN :#{#dashboard.transactions}")
 	public Page<Transaction> findByDashboard(@Param("dashboard") Dashboard dashboard, Pageable pageable);

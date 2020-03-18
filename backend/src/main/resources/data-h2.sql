@@ -13,9 +13,9 @@ INSERT INTO FLATMATE (id, nickname, email, password, roles, enabled, first_step,
 INSERT INTO DASHBOARD (ID, OWNER_ID) VALUES (1, 1);
 INSERT INTO DASHBOARD (ID, OWNER_ID) VALUES (2, 8);
 
-INSERT INTO CASHIER (id, balance, name, started) VALUES (1, 32.54, 'Energy & bin', 0);
-INSERT INTO CASHIER (id, balance, name, started) VALUES (2, 120, 'Geral', 23);
-INSERT INTO CASHIER (id, balance, name, started) VALUES (3, 3.11, 'Rent & Clean', 12.45);
+INSERT INTO CASHIER (id, owner_id, balance, name, started) VALUES (1, 1, 32.54, 'Energy & bin', 0);
+INSERT INTO CASHIER (id, owner_id, balance, name, started) VALUES (2, 1, 120, 'Geral', 23);
+INSERT INTO CASHIER (id, owner_id, balance, name, started) VALUES (3, 8, 3.11, 'Rent & Clean', 12.45);
 			  
 INSERT INTO DASHBOARD_CASHIER (ID_DASHBOARD, ID_CASHIER) VALUES (1, 1);
 INSERT INTO DASHBOARD_CASHIER (ID_DASHBOARD, ID_CASHIER) VALUES (1, 2);

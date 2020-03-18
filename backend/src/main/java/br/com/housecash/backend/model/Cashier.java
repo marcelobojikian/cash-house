@@ -3,14 +3,20 @@ package br.com.housecash.backend.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,6 +42,11 @@ public class Cashier implements Serializable {
 	@Column
 	@NumberFormat(style=Style.CURRENCY)
 	private BigDecimal balance;
+	
+    @OneToOne
+    @JoinColumn(name = "OWNER_ID")
+	@JsonProperty(access = Access.WRITE_ONLY)
+    private Flatmate owner;
 
 	public Cashier() {
 		super();
