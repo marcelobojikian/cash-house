@@ -19,7 +19,14 @@ The project server contains all the services that mobile and web applications ca
     3. Download and Install ?? Plugin Maven for lombok ??
     4. Install Dependencies from pom.xml
     5. Right Click on /src/main/java/br/com/housecash/backend/App.java > Run
+    
+### Rest documentation
 
+When executing the project it is possible to view the documentation of the resources that can be consumed by the link http://localhost:8080/swagger-ui.html
+
+<p align="center">
+ <img src="images/Swagger2.png" width="600" height="500">
+</p>
 
 ## Mobile project 
 
