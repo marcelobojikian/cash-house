@@ -1,6 +1,7 @@
 package br.com.housecash.backend.service;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.Transaction.Action;
 import br.com.housecash.backend.repository.CashierRepository;
 import br.com.housecash.backend.repository.DashboardRepository;
+import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +34,9 @@ public class CashierServiceImpl implements CashierService {
 
 	@Autowired
 	private DashboardRepository dashboardRepository;
+
+	@Autowired
+	private TransactionRepository transactionRepository;
 
 	@Override
 	public Cashier findById(Dashboard dashboard, long id) {
@@ -53,6 +58,7 @@ public class CashierServiceImpl implements CashierService {
 		}
 
 		Cashier cashier = new Cashier(name, started, balance);
+		cashier.setOwner(flatmateLogged);
 		dashboard.getCashiers().add(cashier);
 		
 		return cashierRepository.save(cashier);
@@ -125,15 +131,20 @@ public class CashierServiceImpl implements CashierService {
 	@Transactional
 	public void deleteCashierById(Dashboard dashboard, long id) {
 		
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
+		
+		if(!dashboard.getOwner().equals(flatmateLogged)) {
+			throw new AccessDeniedException(flatmateLogged);
+		}
+		
 		cashierRepository.findByDashboardAndId(dashboard, id).map(entity -> {
+			
+			Collection<Transaction> transactions = transactionRepository.findByDashboardAndCashier(dashboard, entity);
 
-			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
 			dashboard.getCashiers().remove(entity);
-			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
+			dashboard.getTransactions().removeAll(transactions);
 			
 			dashboardRepository.save(dashboard);
-			
-			cashierRepository.save(entity);
 			
 			return entity;
 			

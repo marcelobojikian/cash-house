@@ -41,7 +41,7 @@ public class Dashboard implements Serializable {
 	@JoinTable(name = "DASHBOARD_TRANSACTION", joinColumns = @JoinColumn(name = "ID_DASHBOARD"), inverseJoinColumns = @JoinColumn(name = "ID_TRANSACTION"))
 	private List<Transaction> transactions = new ArrayList<Transaction>();
 
-	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.PERSIST)
 	@JoinTable(name = "DASHBOARD_CASHIER", joinColumns = @JoinColumn(name = "ID_DASHBOARD"), inverseJoinColumns = @JoinColumn(name = "ID_CASHIER"))
 	private List<Cashier> cashiers = new ArrayList<Cashier>();
 	

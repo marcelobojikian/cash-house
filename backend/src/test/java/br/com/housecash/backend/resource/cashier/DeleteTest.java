@@ -21,25 +21,46 @@ import br.com.housecash.backend.resource.Oauth2;
 public class DeleteTest extends Oauth2 {
 
 	@Test
-	public void delete_Forbidden_RoleType_USER() throws Exception {
-
-		loginWith(JEAN);
-
-		// @formatter:off
-		delete("/cashiers/3")
-				.andExpect(status().isMethodNotAllowed());
-        // @formatter:on
-
-	}
-
-	@Test
-	public void delete_OK_RoleType_ADMIN() throws Exception {
+	public void delete_OK() throws Exception {
 
 		loginWith(MARCELO);
 
 		// @formatter:off
 		delete("/cashiers/2")
-				.andExpect(status().isMethodNotAllowed());
+				.andExpect(status().isOk());
+		
+		get("/cashier/2")
+				.andExpect(status().isNotFound());
+		get("/transactions/3")
+				.andExpect(status().isNotFound());
+		get("/transactions/4")
+				.andExpect(status().isNotFound());
+		get("/transactions/5")
+				.andExpect(status().isNotFound());
+        // @formatter:on
+
+	}
+
+	@Test
+	public void delete_Forbidden() throws Exception {
+
+		loginWith(MARCELO).dashboard(JEAN);
+
+		// @formatter:off
+		delete("/cashiers/3")
+				.andExpect(status().isForbidden());
+        // @formatter:on
+
+	}
+
+	@Test
+	public void delete_NotFound() throws Exception {
+
+		loginWith(MARCELO);
+
+		// @formatter:off
+		delete("/cashiers/4")
+				.andExpect(status().isNotFound());
         // @formatter:on
 
 	}

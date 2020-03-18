@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,12 +84,17 @@ public class CashierController {
 			@RequestDTO(UpdateCashier.class) @Valid UpdateCashier cashier) throws Exception {
 
 		String name = cashier.getName();
-
 		return cashierService.update(dashboard, id, name);
 
-
 	}
-	
-	// TODO Criar endpoint de remover Cashier
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(value = "Return a cashier entity partial updated", response = Cashier.class)
+	public void detele(
+			@ApiIgnore Dashboard dashboard, 
+			@PathVariable Long id){
+		cashierService.deleteCashierById(dashboard, id);
+	}
 	
 }
