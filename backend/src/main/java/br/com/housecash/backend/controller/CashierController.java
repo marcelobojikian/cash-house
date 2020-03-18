@@ -2,14 +2,12 @@ package br.com.housecash.backend.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,13 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.housecash.backend.exception.InvalidFieldException;
-import br.com.housecash.backend.exception.NoContentException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.dto.CreateCashier;
+import br.com.housecash.backend.model.dto.UpdateCashier;
 import br.com.housecash.backend.service.CashierService;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/cashiers")
@@ -37,20 +36,23 @@ public class CashierController {
 	private CashierService cashierService; 
 
 	@GetMapping("")
-	public List<Cashier> findAll(Dashboard dashboard) {
+	@ApiOperation(value = "Return a list with all cashiers", response = Cashier[].class)
+	public List<Cashier> findAll(@ApiIgnore Dashboard dashboard) {
 		return cashierService.findAll(dashboard);
 	}
 
 	@GetMapping("/{id}")
-	public Cashier findById(Dashboard dashboard, @PathVariable Long id) {
+	@ApiOperation(value = "Return a cashier entity by id", response = Cashier.class)
+	public Cashier findById(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
 		return cashierService.findById(dashboard, id);
 	}
 
 	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Return a cashier entity created", response = Cashier.class)
 	public Cashier create(
-			Dashboard dashboard, 
-			@RequestDTO(CreateCashier.class) @Valid Cashier cashier) {
+			@ApiIgnore Dashboard dashboard, 
+			@RequestDTO(CreateCashier.class) @Valid CreateCashier cashier) {
 		
 		String name = cashier.getName();
 		BigDecimal started = cashier.getStarted();
@@ -65,30 +67,28 @@ public class CashierController {
 	}
 
 	@PutMapping("/{id}")
+	@ApiOperation(value = "Return a cashier entity updated", response = Cashier.class)
 	public Cashier update(
-			Dashboard dashboard, 
+			@ApiIgnore Dashboard dashboard, 
 			@PathVariable Long id, 
 			@RequestBody Cashier cashier) {
 		return cashierService.update(dashboard, id, cashier);
 	}
 
 	@PatchMapping("/{id}")
+	@ApiOperation(value = "Return a cashier entity partial updated", response = Cashier.class)
 	public Cashier patch(
-			Dashboard dashboard, 
+			@ApiIgnore Dashboard dashboard, 
 			@PathVariable Long id,
-			@RequestBody Map<String, String> update) throws Exception {
-		
-		if(update.isEmpty()) {
-			throw new NoContentException();
-		}
+			@RequestDTO(UpdateCashier.class) @Valid UpdateCashier cashier) throws Exception {
 
-		String name = update.get("name");
-		if (!StringUtils.isEmpty(name)) {
-			return cashierService.update(dashboard, id, name);
-		} else {
-			throw new InvalidFieldException(update.keySet());
-		}
+		String name = cashier.getName();
+
+		return cashierService.update(dashboard, id, name);
+
 
 	}
+	
+	// TODO Criar endpoint de remover Cashier
 	
 }

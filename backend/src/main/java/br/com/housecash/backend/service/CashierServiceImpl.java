@@ -100,26 +100,6 @@ public class CashierServiceImpl implements CashierService {
 	}
 
 	@Override
-	@Transactional
-	public void deleteCashierById(Dashboard dashboard, long id) {
-		
-		cashierRepository.findByDashboardAndId(dashboard, id).map(entity -> {
-
-			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
-			dashboard.getCashiers().remove(entity);
-			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
-			
-			dashboardRepository.save(dashboard);
-			
-			cashierRepository.save(entity);
-			
-			return entity;
-			
-		}).orElseThrow(() ->  new EntityNotFoundException(Cashier.class, id) );
-		
-	}
-
-	@Override
 	public synchronized void applyTransaction(Transaction transaction) {
 		
 		Long cashierId = transaction.getCashier().getId();
@@ -138,6 +118,26 @@ public class CashierServiceImpl implements CashierService {
 		log.info(String.format("Changed balance by %s", cashier.getBalance()));
 		
 		cashierRepository.save(cashier);
+		
+	}
+
+	@Override
+	@Transactional
+	public void deleteCashierById(Dashboard dashboard, long id) {
+		
+		cashierRepository.findByDashboardAndId(dashboard, id).map(entity -> {
+
+			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
+			dashboard.getCashiers().remove(entity);
+			System.out.println("dashboard.getCashiers(): " +  dashboard.getCashiers().size());
+			
+			dashboardRepository.save(dashboard);
+			
+			cashierRepository.save(entity);
+			
+			return entity;
+			
+		}).orElseThrow(() ->  new EntityNotFoundException(Cashier.class, id) );
 		
 	}
 

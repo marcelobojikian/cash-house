@@ -1,7 +1,6 @@
 package br.com.housecash.backend.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -21,10 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.exception.InvalidFieldException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
+import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.dto.CreateFlatmate;
+import br.com.housecash.backend.model.dto.UpdateFlatmate;
 import br.com.housecash.backend.service.FlatmateService;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/flatmates")
@@ -35,20 +38,23 @@ public class FlatmateController {
 	private FlatmateService flatmateService;
 
 	@GetMapping("")
-	public List<Flatmate> findAll(Dashboard dashboard) {
+	@ApiOperation(value = "Return a list with all flatmates", response = Flatmate[].class)
+	public List<Flatmate> findAll(@ApiIgnore Dashboard dashboard) {
 		return flatmateService.findAll(dashboard);
 	}
 
 	@GetMapping("/{id}")
-	public Flatmate findById(Dashboard dashboard, @PathVariable Long id) {
+	@ApiOperation(value = "Return a flatmate entity by id", response = Flatmate.class)
+	public Flatmate findById(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
 		return flatmateService.findById(dashboard, id);
 	}
 
 	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Return a flatmate entity created", response = Flatmate.class)
 	public Flatmate create(
-			Dashboard dashboard,
-			@RequestDTO(CreateFlatmate.class) @Valid Flatmate flatmate) {
+			@ApiIgnore Dashboard dashboard,
+			@RequestDTO(CreateFlatmate.class) @Valid CreateFlatmate flatmate) {
 		
 		String email = flatmate.getEmail();
 		String nickname = flatmate.getNickname();
@@ -63,46 +69,44 @@ public class FlatmateController {
 	}
 
 	@PutMapping("/{id}")
+	@ApiOperation(value = "Return a flatmate entity updated", response = Flatmate.class)
 	public Flatmate update(@PathVariable Long id, @RequestBody Flatmate flatmate) {
 		return flatmateService.update(id, flatmate);
 	}
 
 	@PatchMapping("/{id}")
+	@ApiOperation(value = "Return a flatmate entity partial updated", response = Cashier.class)
 	public Flatmate patch(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@PathVariable Long id,
-			@RequestBody Map<String, String> update) {
+			@RequestDTO(UpdateFlatmate.class) @Valid UpdateFlatmate flatmate) {
 
-		String nickname = update.get("nickname");
-		if (!StringUtils.isEmpty(nickname)) {
-
-			String password = update.get("password");
-			
-			if(StringUtils.isEmpty(password)) {
-				return flatmateService.update(id, nickname);
-			}else {
-				return flatmateService.update(id, nickname, password);
-			}
-			
-		} else {
-			throw new InvalidFieldException(update.keySet());
+		String nickname = flatmate.getNickname();
+		String password = flatmate.getPassword();
+		
+		if(StringUtils.isEmpty(password)) {
+			return flatmateService.update(id, nickname);
+		}else {
+			return flatmateService.update(id, nickname, password);
 		}
 
 	}
-
+	
+	// TODO Mover para o controller de usuario Method: "setpGuestCompleted".
 	@PatchMapping("/{id}/step/guest")
+	@ApiOperation(value = "Return a flatmate entity with guest step completed", response = Cashier.class)
 	public Flatmate setpGuestCompleted(
-			Dashboard dashboard,
+			@ApiIgnore Dashboard dashboard,
 			@PathVariable Long id,
-			@RequestBody Map<String, String> update) {
+			@RequestDTO(UpdateFlatmate.class) @Valid UpdateFlatmate flatmate) {
 
-		String nickname = update.get("nickname");
-		String password = update.get("password");
+		String nickname = flatmate.getNickname();
+		String password = flatmate.getPassword();
 		
-		if (!StringUtils.isEmpty(nickname) && !StringUtils.isEmpty(password)) {
+		if (!StringUtils.isEmpty(password)) {
 			return flatmateService.updateGuest(id, nickname, password);
 		} else {
-			throw new InvalidFieldException(update.keySet());
+			throw new InvalidFieldException(password);
 		}
 
 	}

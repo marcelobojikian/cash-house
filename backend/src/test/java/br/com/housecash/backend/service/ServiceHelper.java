@@ -1,16 +1,11 @@
 package br.com.housecash.backend.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
-import br.com.housecash.backend.resource.ContentHelper;
-import br.com.housecash.backend.util.FlatmateBuilder;
-import br.com.housecash.backend.util.FlatmateBuilder.FlatmateBuilderBuilder;
 
 public class ServiceHelper {
 	
