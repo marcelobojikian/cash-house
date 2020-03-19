@@ -90,11 +90,11 @@ public class CashierController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Return a cashier entity partial updated", response = Cashier.class)
+	@ApiOperation(value = "Return status OK when deleted", response = Cashier.class)
 	public void detele(
 			@ApiIgnore Dashboard dashboard, 
 			@PathVariable Long id){
-		cashierService.deleteCashierById(dashboard, id);
+		cashierService.delete(dashboard, id);
 	}
 	
 }

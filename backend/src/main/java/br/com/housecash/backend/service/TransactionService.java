@@ -25,6 +25,10 @@ public interface TransactionService {
 	public Transaction findById(Dashboard dashboard, Long id);
 	
 	public List<Transaction> findByDate(Integer pageNo, Integer pageSize);
+	
+	public Collection<Transaction> findByCashierReferences(Dashboard dashboard, Cashier cashier);
+	
+	public Collection<Transaction> findByFlatmateReferences(Dashboard dashboard, Flatmate createBy, Flatmate assigned);
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public Transaction update(Dashboard dashboard, Long id, Transaction newTransaction);
@@ -34,6 +38,8 @@ public interface TransactionService {
 	public void updateCashier(Dashboard dashboard, Long id, Cashier cashier);
 
 	public void updateValue(Dashboard dashboard, Long id, BigDecimal value);
+	
+	public void delete(Dashboard dashboard, Long id);
 	
 	/* Actions */
 

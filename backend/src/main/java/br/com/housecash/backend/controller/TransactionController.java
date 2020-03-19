@@ -19,6 +19,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.NoContentException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
@@ -49,7 +51,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("/transactions")
 @PreAuthorize("hasAnyRole('USER')")
-// TODO Teste de integracao imcompleto.
 public class TransactionController {
 
 	@Autowired
@@ -146,7 +147,7 @@ public class TransactionController {
 		if (StringUtils.isEmpty(flatmateId)) {
 			return transactionService.createDeposit(dashboard, cashier, value);
 		} else {
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId);
+			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
 			return transactionService.createDeposit(dashboard, cashier, flatmateAssigned, value);
 		}
 		
@@ -167,7 +168,7 @@ public class TransactionController {
 		if (StringUtils.isEmpty(flatmateId)) {
 			return transactionService.createwithdraw(dashboard, cashier, value);
 		} else {
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId);
+			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
 			return transactionService.createwithdraw(dashboard, cashier, flatmateAssigned, value);
 		}
 		
@@ -195,7 +196,7 @@ public class TransactionController {
 		
 		if(content.haveFlatmateAssigned()) {
 			Long flatmateId = content.getAssigned();
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId);
+			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
 			transactionService.updateFlatmateAssigned(dashboard, id, flatmateAssigned);
 		}
 		
@@ -211,6 +212,15 @@ public class TransactionController {
 		
 		return transactionService.findById(dashboard, id);
 
+	}
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(value = "Return status OK when deleted", response = Transaction.class)
+	public void detele(
+			@ApiIgnore Dashboard dashboard, 
+			@PathVariable Long id){
+		transactionService.delete(dashboard, id);
 	}
 
 }

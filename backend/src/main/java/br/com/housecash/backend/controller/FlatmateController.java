@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.InvalidFieldException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
@@ -46,7 +48,7 @@ public class FlatmateController {
 	@GetMapping("/{id}")
 	@ApiOperation(value = "Return a flatmate entity by id", response = Flatmate.class)
 	public Flatmate findById(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		return flatmateService.findById(dashboard, id);
+		return flatmateService.findById(dashboard, id).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, id));
 	}
 
 	@PostMapping("")
@@ -109,6 +111,15 @@ public class FlatmateController {
 			throw new InvalidFieldException(password);
 		}
 
+	}
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(value = "Return status OK when deleted", response = Flatmate.class)
+	public void detele(
+			@ApiIgnore Dashboard dashboard, 
+			@PathVariable Long id){
+		flatmateService.delete(dashboard, id);
 	}
 
 }

@@ -33,7 +33,7 @@ public class Dashboard implements Serializable {
     @OneToOne(cascade = CascadeType.PERSIST)
     private Flatmate owner;
 
-	@OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.PERSIST)
 	@JoinTable(name = "DASHBOARD_GUEST", joinColumns = @JoinColumn(name = "ID_DASHBOARD"), inverseJoinColumns = @JoinColumn(name = "ID_FLATMATE"))
 	private List<Flatmate> guests = new ArrayList<Flatmate>();
 	

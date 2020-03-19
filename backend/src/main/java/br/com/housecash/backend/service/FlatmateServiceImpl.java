@@ -1,15 +1,19 @@
 package br.com.housecash.backend.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
+import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.repository.FlatmateRepository;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 
@@ -20,10 +24,16 @@ public class FlatmateServiceImpl implements FlatmateService {
 	private AuthenticationFacade authenticationFacade; 
 	
 	@Autowired
-	private FlatmateRepository flatmateRepository;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	private FlatmateRepository flatmateRepository;
+
+	@Autowired
+	private DashboardService dashboardService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	@Override
 	public Flatmate findByEmail(String email) {
@@ -31,13 +41,13 @@ public class FlatmateServiceImpl implements FlatmateService {
 	}
 
 	@Override
-	public Flatmate findById(Dashboard dashboard, long id) {
+	public Optional<Flatmate> findById(Dashboard dashboard, long id) {
 		
 		if(dashboard.getOwner().getId().equals(id)) {
-			return dashboard.getOwner();
+			return Optional.of(dashboard.getOwner());
 		}
 		
-		return flatmateRepository.findByDashboardAndId(dashboard, id).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, id));
+		return flatmateRepository.findByDashboardAndId(dashboard, id);//.orElseThrow(() -> new EntityNotFoundException(Flatmate.class, id));
 		
 	}
 
@@ -145,6 +155,29 @@ public class FlatmateServiceImpl implements FlatmateService {
 			entity.setGuestStep(false);
 			
 			return flatmateRepository.save(entity);
+			
+		}).orElseThrow(() ->  new EntityNotFoundException(Flatmate.class, id) );
+		
+	}
+
+	@Override
+	@Transactional
+	public void delete(Dashboard dashboard, long id) {
+		
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
+		
+		if(!dashboard.getOwner().equals(flatmateLogged)) {
+			throw new AccessDeniedException(flatmateLogged);
+		}
+		
+		flatmateRepository.findByDashboardAndId(dashboard, id).map(entity -> {
+			
+			Collection<Transaction> transactions = transactionService.findByFlatmateReferences(dashboard, entity, entity);
+
+			dashboardService.removeGuest(dashboard, entity);
+			dashboardService.removeTransactions(dashboard, transactions);
+			
+			return entity;
 			
 		}).orElseThrow(() ->  new EntityNotFoundException(Flatmate.class, id) );
 		
