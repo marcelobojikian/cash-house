@@ -25,19 +25,8 @@ public class AuthenticationFacadeBean implements AuthenticationFacade {
 		return getLoggedUser().getFlatmate();
 	}
  
-    /**
-     * This method returns the principal[user-name] of logged-in user.
-     */
     private CurrentUser getCurrentUser(){
-    	
-        Object principal = getAuthentication().getPrincipal();
- 
-        if (principal instanceof CurrentUser) {
-            return (CurrentUser) principal;
-        } else {
-            throw new ClassCastException(principal.toString());
-        }
-        
+        return (CurrentUser) getAuthentication().getPrincipal();
     }
 
 }

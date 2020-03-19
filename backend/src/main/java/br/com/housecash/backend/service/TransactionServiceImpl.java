@@ -21,7 +21,6 @@ import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.Transaction.Status;
-import br.com.housecash.backend.repository.FlatmateRepository;
 import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 
@@ -33,9 +32,12 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Autowired
 	private CashierService cashierService;
+
+	@Autowired
+	private DashboardService dashboardService;
 	
 	@Autowired
-	private FlatmateRepository flatmateRepository;
+	private FlatmateService flatmateService;
 	
     @Autowired
     private TransactionRepository transactionRepository;
@@ -171,14 +173,14 @@ public class TransactionServiceImpl implements TransactionService {
 			if(dashboard.isOwner(assignedId)) {
 				entity.setAssigned(dashboard.getOwner());
 			} else {
-				Flatmate assigned = flatmateRepository.findByDashboardAndId(dashboard, assignedId).orElseThrow(() -> new EntityNotFoundException(Transaction.class, "assigned", assignedId));
+				Flatmate assigned = flatmateService.findById(dashboard, assignedId).orElseThrow(() -> new EntityNotFoundException(Transaction.class, "assigned", assignedId));
 				entity.setAssigned(assigned);
 			}
 
 			if(dashboard.isOwner(createById)) {
 				entity.setCreateBy(dashboard.getOwner());
 			} else {
-				Flatmate createBy = flatmateRepository.findByDashboardAndId(dashboard, createById).orElseThrow(() -> new EntityNotFoundException(Transaction.class, "createBy", createById));
+				Flatmate createBy = flatmateService.findById(dashboard, createById).orElseThrow(() -> new EntityNotFoundException(Transaction.class, "createBy", createById));
 				entity.setCreateBy(createBy);
 			}
 			
@@ -338,6 +340,35 @@ public class TransactionServiceImpl implements TransactionService {
 		} else {
 			throw new AccessDeniedException(flatmateLogged);
 		}
+		
+	}
+
+	@Override
+	public Collection<Transaction> findByFlatmateReferences(Dashboard dashboard, Flatmate createBy, Flatmate assigned){
+		return transactionRepository.findByDashboardAndFlatmateRef(dashboard, createBy, assigned);
+	}
+
+	@Override
+	public Collection<Transaction> findByCashierReferences(Dashboard dashboard, Cashier cashier){
+		return transactionRepository.findByDashboardAndCashier(dashboard, cashier);
+	}
+
+	@Override
+	public void delete(Dashboard dashboard, Long id) {
+		
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
+		
+		if(!dashboard.getOwner().equals(flatmateLogged)) {
+			throw new AccessDeniedException(flatmateLogged);
+		}
+		
+		transactionRepository.findByDashboardAndId(dashboard, id).map(entity -> {
+			
+			dashboardService.removeTransaction(dashboard, entity);
+			
+			return entity;
+			
+		}).orElseThrow(() ->  new EntityNotFoundException(Transaction.class, id) );
 		
 	}
 

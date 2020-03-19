@@ -17,8 +17,6 @@ import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.Transaction.Action;
 import br.com.housecash.backend.repository.CashierRepository;
-import br.com.housecash.backend.repository.DashboardRepository;
-import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,10 +31,10 @@ public class CashierServiceImpl implements CashierService {
 	private CashierRepository cashierRepository;
 
 	@Autowired
-	private DashboardRepository dashboardRepository;
+	private DashboardService dashboardService;
 
 	@Autowired
-	private TransactionRepository transactionRepository;
+	private TransactionService transactionService;
 
 	@Override
 	public Cashier findById(Dashboard dashboard, long id) {
@@ -129,7 +127,7 @@ public class CashierServiceImpl implements CashierService {
 
 	@Override
 	@Transactional
-	public void deleteCashierById(Dashboard dashboard, long id) {
+	public void delete(Dashboard dashboard, long id) {
 		
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		
@@ -139,12 +137,10 @@ public class CashierServiceImpl implements CashierService {
 		
 		cashierRepository.findByDashboardAndId(dashboard, id).map(entity -> {
 			
-			Collection<Transaction> transactions = transactionRepository.findByDashboardAndCashier(dashboard, entity);
+			Collection<Transaction> transactions = transactionService.findByCashierReferences(dashboard, entity);
 
-			dashboard.getCashiers().remove(entity);
-			dashboard.getTransactions().removeAll(transactions);
-			
-			dashboardRepository.save(dashboard);
+			dashboardService.removeCashier(dashboard, entity);
+			dashboardService.removeTransactions(dashboard, transactions);
 			
 			return entity;
 			

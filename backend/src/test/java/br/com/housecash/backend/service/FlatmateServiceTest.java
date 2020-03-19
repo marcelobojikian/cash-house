@@ -12,32 +12,38 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
+import br.com.housecash.backend.App;
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.repository.FlatmateRepository;
+import br.com.housecash.backend.security.LoginWithAdmin;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 
 @RunWith(SpringRunner.class)
+@WebAppConfiguration
+@SpringBootTest(classes = App.class)
 public class FlatmateServiceTest extends ServiceHelper{
-
-	@Autowired
-	private FlatmateService flatmateService;
 
 	@TestConfiguration
 	static class FlatmateServiceImplTestContextConfiguration {
 		@Bean
-		public FlatmateService employeeService() {
+		public FlatmateService flatmateService() {
 			return new FlatmateServiceImpl();
 		}
 	}
+
+	@Autowired
+	private FlatmateService flatmateService;
 
 	@MockBean
 	private AuthenticationFacade authenticationFacade;
@@ -82,7 +88,7 @@ public class FlatmateServiceTest extends ServiceHelper{
         
 		when(flatmateRepository.findByDashboardAndId(dashboard, 2L)).thenReturn(Optional.of(joao));
 		
-		Flatmate flatmate = flatmateService.findById(dashboard, 2L);
+		Flatmate flatmate = flatmateService.findById(dashboard, 2L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 2L));
 		
 		assert(flatmate.getEmail()).equals("joao@mail.com");
 		assert(flatmate.getNickname()).equals("Joao A. M.");
@@ -96,7 +102,7 @@ public class FlatmateServiceTest extends ServiceHelper{
 
         Dashboard dashboard = admin.getDashboard();
 		
-		Flatmate flatmate = flatmateService.findById(dashboard, 1L);
+		Flatmate flatmate = flatmateService.findById(dashboard, 1L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 1L));
 		
 		assert(flatmate.getEmail()).equals("admin@mail.com");
 		assert(flatmate.getNickname()).equals("Administrator");
@@ -112,7 +118,7 @@ public class FlatmateServiceTest extends ServiceHelper{
 		
 		when(flatmateRepository.findById(3L)).thenReturn(Optional.empty());
 		
-		flatmateService.findById(dashboard, 3L);
+		flatmateService.findById(dashboard, 3L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 3L));
 		
 	}
 
@@ -180,6 +186,7 @@ public class FlatmateServiceTest extends ServiceHelper{
 	}
 
 	@Test
+	@LoginWithAdmin
 	public void whenUpdate_thenReturnObject() throws Exception {
 
 		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "old-password");
@@ -198,6 +205,7 @@ public class FlatmateServiceTest extends ServiceHelper{
 	}
 
 	@Test(expected = EntityNotFoundException.class)
+	@LoginWithAdmin
 	public void whenUpdate_thenThrowEntityNotFoundException() throws Exception {
 
 		Flatmate newFlatmate = createFlatmate(null, "new@mail.com", "update", "new-password");

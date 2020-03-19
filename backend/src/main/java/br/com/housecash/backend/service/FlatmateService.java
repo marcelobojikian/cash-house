@@ -1,6 +1,7 @@
 package br.com.housecash.backend.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -10,7 +11,7 @@ import br.com.housecash.backend.model.Flatmate;
 //@PreAuthorize("hasAnyRole('ADMIN')")
 public interface FlatmateService {
 
-	public Flatmate findById(Dashboard dashboard, long id);
+	public Optional<Flatmate> findById(Dashboard dashboard, long id);
 	
 	public Flatmate findByEmail(String email);
 	
@@ -26,5 +27,7 @@ public interface FlatmateService {
 	public Flatmate update(long id, String nickname, String password);
 	
 	public Flatmate updateGuest(long id, String nickname, String password);
+
+	public void delete(Dashboard dashboard, long id);
 
 }

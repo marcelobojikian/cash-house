@@ -1,4 +1,4 @@
-package br.com.housecash.backend.resource.flatmate;
+package br.com.housecash.backend.resource.transaction;
 
 import static br.com.housecash.backend.resource.SecurityAccess.User.JEAN;
 import static br.com.housecash.backend.resource.SecurityAccess.User.MARCELO;
@@ -26,11 +26,9 @@ public class DeleteTest extends Oauth2 {
 		loginWith(MARCELO);
 
 		// @formatter:off
-		delete("/flatmates/2")
+		delete("/transactions/2")
 				.andExpect(status().isOk());
 		
-		get("/flatmates/2")
-				.andExpect(status().isNotFound());
 		get("/transactions/2")
 				.andExpect(status().isNotFound());
         // @formatter:on
@@ -43,7 +41,7 @@ public class DeleteTest extends Oauth2 {
 		loginWith(MARCELO).dashboard(JEAN);
 
 		// @formatter:off
-		delete("/flatmates/9")
+		delete("/transactions/9")
 				.andExpect(status().isForbidden());
         // @formatter:on
 
@@ -55,7 +53,7 @@ public class DeleteTest extends Oauth2 {
 		loginWith(MARCELO);
 
 		// @formatter:off
-		delete("/flatmates/99")
+		delete("/transactions/99")
 				.andExpect(status().isNotFound());
         // @formatter:on
 
