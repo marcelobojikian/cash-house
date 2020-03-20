@@ -2,9 +2,13 @@ package br.com.housecash.backend.service;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,20 +22,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
-import br.com.housecash.backend.App;
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
+import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.repository.FlatmateRepository;
 import br.com.housecash.backend.security.LoginWithAdmin;
 import br.com.housecash.backend.security.service.AuthenticationFacade;
 
 @RunWith(SpringRunner.class)
-@WebAppConfiguration
-@SpringBootTest(classes = App.class)
+@SpringBootTest
 public class FlatmateServiceTest extends ServiceHelper{
 
 	@TestConfiguration
@@ -50,6 +52,12 @@ public class FlatmateServiceTest extends ServiceHelper{
 
 	@MockBean
 	private FlatmateRepository flatmateRepository;
+
+	@MockBean
+	private DashboardService dashboardService;
+
+	@MockBean
+	private TransactionService transactionService;
 
 	@MockBean
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -340,6 +348,49 @@ public class FlatmateServiceTest extends ServiceHelper{
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.updateGuest(2L, "update", "new-password");
+		
+	}
+	
+	@Test
+	public void whenDelete_thenReturnVoid() throws Exception {
+
+		Flatmate flatmate = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
+		Dashboard dashboard = flatmate.getDashboard();
+
+		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
+		when(flatmateRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(flatmate));
+		when(transactionService.findByFlatmateReferences(eq(dashboard), any(Flatmate.class), any(Flatmate.class))).thenReturn(new ArrayList<Transaction>());
+		doNothing().when(dashboardService).removeGuest(eq(dashboard), any(Flatmate.class));
+		doNothing().when(dashboardService).removeTransactions(eq(dashboard), anyCollection());
+		
+		flatmateService.delete(dashboard, 1l);
+		
+	}
+
+	@Test(expected = EntityNotFoundException.class)
+	public void whenDelete_thenThrowEntityNotFoundException() throws Exception {
+
+		Flatmate flatmate = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
+		Dashboard dashboard = flatmate.getDashboard();
+
+		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
+		when(flatmateRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
+		
+		flatmateService.delete(dashboard, 1l);
+		
+	}
+
+	@Test(expected = AccessDeniedException.class)
+	public void whenDelete_thenThrowAccessDeniedException() throws Exception {
+
+		Flatmate flatmate = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
+		Dashboard dashboard = flatmate.getDashboard();
+
+		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
+
+		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
+		
+		flatmateService.delete(dashboard, 1l);
 		
 	}
 

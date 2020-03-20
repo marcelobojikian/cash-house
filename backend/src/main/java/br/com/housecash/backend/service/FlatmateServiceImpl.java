@@ -86,7 +86,7 @@ public class FlatmateServiceImpl implements FlatmateService {
 			entity.setNickname(flatmate.getNickname());
 			entity.setPassword(cryptPassword);
 			entity.setRoles(flatmate.getRoles());
-			entity.setEnabled(flatmate.getEnabled());
+			entity.setEnabled(flatmate.isEnabled());
 			entity.setFirstStep(flatmate.isFirstStep());
 			entity.setGuestStep(flatmate.isGuestStep());
 			

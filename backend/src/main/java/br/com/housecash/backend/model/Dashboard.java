@@ -14,14 +14,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 @Entity
-@Setter @Getter
-@EqualsAndHashCode @ToString
+@Data
 public class Dashboard implements Serializable {
  
 	private static final long serialVersionUID = 1L;

@@ -35,11 +35,9 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Override
 	public synchronized Dashboard createDashboard(Flatmate flatmate) {
-		
 		Dashboard dashboard = new Dashboard();
 		dashboard.setOwner(flatmate);
 		return dashboardRepository.save(dashboard);
-		
 	}
 
 	@Override

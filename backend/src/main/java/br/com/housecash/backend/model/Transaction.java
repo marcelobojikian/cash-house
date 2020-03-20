@@ -17,37 +17,29 @@ import javax.persistence.PreUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 @Entity
-@EqualsAndHashCode @ToString
+@Data
 public class Transaction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter @Getter
 	private Long id;
 
 	@OneToOne
-    @Setter @Getter
 	private Flatmate createBy;
 
 	@OneToOne
-    @Setter @Getter
 	private Flatmate assigned;
 
 	@OneToOne
-    @Setter @Getter
 	private Cashier cashier;
 
 	@Column
     @Enumerated(EnumType.STRING)
-    @Setter @Getter
 	private Status status;
 	public static enum Status {
 		CREATED, SENDED, FINISHED, CANCELED, DELETED;
@@ -55,21 +47,17 @@ public class Transaction implements Serializable {
 
 	@Column
     @Enumerated(EnumType.STRING)
-    @Setter @Getter
 	private Action action;
 	public static enum Action {
 		DEPOSIT, WITHDRAW ;
 	}
 
 	@Column
-    @Setter @Getter
 	private BigDecimal value;
 
-    @Getter
     @Column(name = "created_at")
     private LocalDateTime createdDate;
 
-    @Getter
     @Column(name = "updated_at")
     private LocalDateTime updatedDate;
 
