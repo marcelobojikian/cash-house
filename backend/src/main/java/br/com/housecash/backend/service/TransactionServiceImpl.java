@@ -43,6 +43,11 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionRepository transactionRepository;
 
 	@Override
+	public Transaction findById(Dashboard dashboard, Long id) {
+		return transactionRepository.findByDashboardAndId(dashboard, id).orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
+	}
+
+	@Override
 	public List<Transaction> findAll(Dashboard dashboard) {
 		return dashboard.getTransactions();
 	}
@@ -195,11 +200,6 @@ public class TransactionServiceImpl implements TransactionService {
 			
 		}).orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
 		
-	}
-
-	@Override
-	public Transaction findById(Dashboard dashboard, Long id) {
-		return transactionRepository.findByDashboardAndId(dashboard, id).orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
 	}
 
 	@Override
