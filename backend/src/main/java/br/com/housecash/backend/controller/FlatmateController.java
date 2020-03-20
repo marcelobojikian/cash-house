@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.exception.EntityNotFoundException;
-import br.com.housecash.backend.exception.InvalidFieldException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
@@ -90,25 +89,6 @@ public class FlatmateController {
 			return flatmateService.update(id, nickname);
 		}else {
 			return flatmateService.update(id, nickname, password);
-		}
-
-	}
-	
-	// TODO Mover para o controller de usuario Method: "setpGuestCompleted".
-	@PatchMapping("/{id}/step/guest")
-	@ApiOperation(value = "Return a flatmate entity with guest step completed", response = Cashier.class)
-	public Flatmate setpGuestCompleted(
-			@ApiIgnore Dashboard dashboard,
-			@PathVariable Long id,
-			@RequestDTO(UpdateFlatmate.class) @Valid UpdateFlatmate flatmate) {
-
-		String nickname = flatmate.getNickname();
-		String password = flatmate.getPassword();
-		
-		if (!StringUtils.isEmpty(password)) {
-			return flatmateService.updateGuest(id, nickname, password);
-		} else {
-			throw new InvalidFieldException(password);
 		}
 
 	}

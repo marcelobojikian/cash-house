@@ -138,29 +138,6 @@ public class FlatmateServiceImpl implements FlatmateService {
 	}
 
 	@Override
-	public Flatmate updateGuest(long id, String nickname, String password)  {
-	
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if(!flatmateLogged.getId().equals(id)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
-		
-		String cryptPassword = bCryptPasswordEncoder.encode(password);
-		
-		return flatmateRepository.findById(id).map(entity -> {
-			
-			entity.setNickname(nickname);
-			entity.setPassword(cryptPassword);
-			entity.setGuestStep(false);
-			
-			return flatmateRepository.save(entity);
-			
-		}).orElseThrow(() ->  new EntityNotFoundException(Flatmate.class, id) );
-		
-	}
-
-	@Override
 	@Transactional
 	public void delete(Dashboard dashboard, long id) {
 		

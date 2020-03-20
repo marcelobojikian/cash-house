@@ -119,9 +119,14 @@ public class RestExceptionHandler {
 		return buildResponse(message, HttpStatus.NOT_FOUND);
 
 	}
+	
+	@ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+	public ResponseEntity<ErrorResponse> entityAccessDeniedHandler(org.springframework.security.access.AccessDeniedException ex) {
+		return buildResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
+	}
 
 	@ExceptionHandler(EmptyResultDataAccessException.class)
-	public ResponseEntity<ErrorResponse> entityNotFoundException(EmptyResultDataAccessException ex) {
+	public ResponseEntity<ErrorResponse> entityEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
 		return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 

@@ -25,8 +25,6 @@ public interface FlatmateService {
 	public Flatmate update(long id, String nickname);
 	
 	public Flatmate update(long id, String nickname, String password);
-	
-	public Flatmate updateGuest(long id, String nickname, String password);
 
 	public void delete(Dashboard dashboard, long id);
 

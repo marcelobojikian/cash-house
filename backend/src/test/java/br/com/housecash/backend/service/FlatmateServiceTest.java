@@ -1,6 +1,5 @@
 package br.com.housecash.backend.service;
 
-import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -304,50 +303,6 @@ public class FlatmateServiceTest extends ServiceHelper{
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.update(2L, "update", "new-password");
-		
-	}
-	
-	@Test
-	public void whenUpdateGuest_thenReturnObject() throws Exception {
-
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "old-password");
-		Flatmate update = createFlatmate(2l, "joao@mail.com", "update", "new-password");
-		update.setGuestStep(false);
-
-		when(flatmateRepository.findById(2L)).thenReturn(Optional.of(joao));
-		when(bCryptPasswordEncoder.encode(anyString())).thenReturn("new-password");
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
-		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(update);
-        
-        Flatmate flatmate = flatmateService.updateGuest(2L, "update", "new-password");
-
-		assert(flatmate.getEmail()).equals("joao@mail.com");
-		assert(flatmate.getNickname()).equals("update");
-		assert(flatmate.getPassword()).equals("new-password");
-		assertFalse(flatmate.isGuestStep());
-		
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void whenUpdateGuest_thenThrowAccessDeniedException() throws Exception {
-
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-		
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
-        
-        flatmateService.updateGuest(3L, "update", "new-password");
-		
-	}
-
-	@Test(expected = EntityNotFoundException.class)
-	public void whenUpdateGuest_thenThrowEntityNotFoundException() throws Exception {
-
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-
-		when(flatmateRepository.findById(2L)).thenReturn(Optional.empty());
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
-        
-        flatmateService.updateGuest(2L, "update", "new-password");
 		
 	}
 	
