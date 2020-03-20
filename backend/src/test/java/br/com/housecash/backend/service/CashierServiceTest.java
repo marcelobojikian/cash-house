@@ -355,10 +355,4 @@ public class CashierServiceTest extends ServiceHelper{
 		
 	}
 
-	
-//	@Test
-//	public void testApplyTransaction() {
-//		fail("Not yet implemented");
-//	}
-
 }
