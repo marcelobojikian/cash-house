@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -117,6 +118,11 @@ public class RestExceptionHandler {
 
 		return buildResponse(message, HttpStatus.NOT_FOUND);
 
+	}
+
+	@ExceptionHandler(EmptyResultDataAccessException.class)
+	public ResponseEntity<ErrorResponse> entityNotFoundException(EmptyResultDataAccessException ex) {
+		return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {

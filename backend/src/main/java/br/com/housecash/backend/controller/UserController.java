@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +40,24 @@ public class UserController {
 	@ApiOperation(value = "Return a list of guest dashboard entities", response = Dashboard[].class)
 	public Collection<Dashboard> getDashboardInvited(@ApiIgnore @UserLogged Flatmate flatmate) {
 		return dashboardService.findMyInvitations(flatmate);
+	}
+
+	@PostMapping("/nickname")
+	@ApiOperation(value = "Return a flatmate entity with update nickname", response = Flatmate.class)
+	public Flatmate updateNickname(@ApiIgnore @UserLogged Flatmate flatmate) {
+		return flatmate;
+	}
+
+	@PostMapping("/password")
+	@ApiOperation(value = "Return a flatmate entity with update password", response = Flatmate.class)
+	public Flatmate updatePassword(@ApiIgnore @UserLogged Flatmate flatmate) {
+		return flatmate;
+	}
+
+	@PostMapping("/step/guest/complete")
+	@ApiOperation(value = "Return a flatmate entity with guest step completed", response = Flatmate.class)
+	public Flatmate updateStepGuest(@ApiIgnore @UserLogged Flatmate flatmate) {
+		return flatmate;
 	}
 
 }

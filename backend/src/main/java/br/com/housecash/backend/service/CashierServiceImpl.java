@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
-import br.com.housecash.backend.exception.InvalidOperationException;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
@@ -104,28 +103,6 @@ public class CashierServiceImpl implements CashierService {
 	}
 
 	@Override
-	public synchronized void applyTransaction(Transaction transaction) {
-		
-		Long cashierId = transaction.getCashier().getId();
-		Cashier cashier = cashierRepository.findById(cashierId).orElseThrow(() -> new EntityNotFoundException(Cashier.class, "cashier", cashierId));
-
-		log.info(String.format("Action %s in a Cashier %s current balance %s", transaction.getAction(), cashierId, cashier.getBalance()));
-		
-		if(transaction.getAction().equals(Action.DEPOSIT)) {
-			cashier.deposit(transaction.getValue());
-		} else if(transaction.getAction().equals(Action.WITHDRAW)) {
-			cashier.withdraw(transaction.getValue());
-		} else {
-			throw new InvalidOperationException(transaction, transaction.getAction());
-		}
-		
-		log.info(String.format("Changed balance by %s", cashier.getBalance()));
-		
-		cashierRepository.save(cashier);
-		
-	}
-
-	@Override
 	@Transactional
 	public void delete(Dashboard dashboard, long id) {
 		
@@ -145,6 +122,26 @@ public class CashierServiceImpl implements CashierService {
 			return entity;
 			
 		}).orElseThrow(() ->  new EntityNotFoundException(Cashier.class, id) );
+		
+	}
+
+	@Override
+	public synchronized void applyTransaction(Transaction transaction) {
+		
+		Long cashierId = transaction.getCashier().getId();
+		Cashier cashier = cashierRepository.findById(cashierId).orElseThrow(() -> new EntityNotFoundException(Cashier.class, "cashier", cashierId));
+
+		log.info(String.format("Action %s in a Cashier %s current balance %s", transaction.getAction(), cashierId, cashier.getBalance()));
+		
+		if(transaction.getAction().equals(Action.DEPOSIT)) {
+			cashier.deposit(transaction.getValue());
+		} else if(transaction.getAction().equals(Action.WITHDRAW)) {
+			cashier.withdraw(transaction.getValue());
+		}
+		
+		log.info(String.format("Changed balance by %s", cashier.getBalance()));
+		
+		cashierRepository.save(cashier);
 		
 	}
 

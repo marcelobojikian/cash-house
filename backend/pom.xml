@@ -137,9 +137,47 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+		        <configuration>
+		          <includes>
+		            <include>**/br/com/housecash/backend/**</include>
+		          </includes>
+		        </configuration>
 			</plugin>
+			
+			<plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <configuration>
+				    <excludes>
+				        <exclude>**/*br/com/housecash/backend/model/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/exception/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/handler/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/repository/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/security/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/App.class</exclude>
+				        <exclude>**/*br/com/housecash/backend/SpringFoxConfig.class</exclude>
+				        <exclude>**/*br/com/housecash/backend/WebConfig.class</exclude>
+				    </excludes>
+				</configuration>
+            	<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				   <execution>
+						<id>report</id>
+				       <phase>test</phase>
+				       <goals>
+				           <goal>report</goal>
+				       </goals>
+				   </execution>
+				</executions>
+        	</plugin>
 
 		</plugins>
+		
 	</build>
 
 </project>

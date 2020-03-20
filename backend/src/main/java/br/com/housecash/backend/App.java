@@ -35,13 +35,11 @@ public class App {
     CommandLineRunner initDatabase(FlatmateRepository repoFlatmate, DashboardRepository repoDashboard) {
         return args -> {
         	
-        	Flatmate joao = new Flatmate("joao@mail.com", new BCryptPasswordEncoder().encode("test"));
-        	joao.setNickname("Joao A. M.");
+        	Flatmate joao = new Flatmate("joao@mail.com", "Joao A. M.", new BCryptPasswordEncoder().encode("test"));
 
             Dashboard dashboard = new Dashboard();
 
-        	Flatmate admin = new Flatmate("admin@mail.com", new BCryptPasswordEncoder().encode("test"));
-        	admin.setNickname("Administrator");
+        	Flatmate admin = new Flatmate("admin@mail.com", "Administrator", new BCryptPasswordEncoder().encode("test"));
         	admin.setEnabled(true);
         	admin.setRoles("ADMIN");
         	

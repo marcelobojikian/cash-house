@@ -14,17 +14,10 @@ import javax.persistence.OneToOne;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 @Entity
-@Setter @Getter
-@EqualsAndHashCode @ToString
+@Data
 public class Cashier implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -44,7 +37,6 @@ public class Cashier implements Serializable {
 	
     @OneToOne
     @JoinColumn(name = "OWNER_ID")
-	@JsonProperty(access = Access.WRITE_ONLY)
     private Flatmate owner;
 
 	public Cashier() {
