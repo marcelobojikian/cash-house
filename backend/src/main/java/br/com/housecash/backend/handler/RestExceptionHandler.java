@@ -124,17 +124,8 @@ public class RestExceptionHandler {
 	}
 
 	private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {
-		// @formatter:off
-        return ResponseEntity.status(status)
-                .body(ErrorResponse.builder()
-                		.timestamp(LocalDateTime.now())
-                        .status(status.value())
-                        .error(status.getReasonPhrase())
-                        .message(message)
-                        .path(request.getServletPath())
-                        .build()
-                );
-		// @formatter:on
+		ErrorResponse error = new ErrorResponse(request, status, message);
+		return new ResponseEntity<ErrorResponse>(error, status);
 	}
 
 }

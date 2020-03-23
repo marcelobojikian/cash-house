@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.query.Param;
 
 import com.querydsl.core.types.Predicate;
@@ -20,7 +22,9 @@ import br.com.housecash.backend.model.QTransaction;
 import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.Transaction.Status;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long>, QuerydslPredicateExecutor<Transaction> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>, 
+											   QuerydslPredicateExecutor<Transaction>,
+											   QuerydslBinderCustomizer<QTransaction> {
 	
 	@Query("SELECT t FROM Transaction t WHERE t IN :#{#dashboard.transactions}")
 	public Collection<Transaction> findByDashboard(@Param("dashboard") Dashboard dashboard);
@@ -62,6 +66,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 						)
 					)
 				, pageable);
+	}
+	
+	@Override
+	default void customize(QuerydslBindings bindings, QTransaction transaction) {
+		bindings.excluding(transaction.id);
 	}
 
 }

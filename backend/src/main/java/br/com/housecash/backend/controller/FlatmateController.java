@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.housecash.backend.controller.dto.CreateFlatmate;
+import br.com.housecash.backend.controller.dto.UpdateFlatmate;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
-import br.com.housecash.backend.model.dto.CreateFlatmate;
-import br.com.housecash.backend.model.dto.UpdateFlatmate;
 import br.com.housecash.backend.service.FlatmateService;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;

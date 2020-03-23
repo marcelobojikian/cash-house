@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.housecash.backend.controller.dto.Propertie;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
-import br.com.housecash.backend.model.dto.Propertie;
 import br.com.housecash.backend.security.annotation.UserLogged;
 import br.com.housecash.backend.service.UserService;
 import io.swagger.annotations.ApiOperation;

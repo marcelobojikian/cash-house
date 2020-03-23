@@ -1,4 +1,4 @@
-package br.com.housecash.backend.model.dto;
+package br.com.housecash.backend.controller.dto;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,7 +15,7 @@ public class Content<T> {
 	private LocalDate createdDate;
 	
 	@JsonProperty("data")
-	private Collection<T> transactions;
+	private Collection<T> data;
 	
 	public int getDay() {
 		return createdDate.getDayOfMonth();
