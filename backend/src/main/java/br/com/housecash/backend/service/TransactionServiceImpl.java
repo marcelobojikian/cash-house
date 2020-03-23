@@ -1,17 +1,15 @@
 package br.com.housecash.backend.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import com.querydsl.core.types.Predicate;
 
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
@@ -53,27 +51,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Collection<Transaction> findAll(Dashboard dashboard, Map<String,String> parameters) {
-		return transactionRepository.findByParameters(dashboard, parameters);
-	}
-
-	@Override
-	public Page<Transaction> findAll(Dashboard dashboard, Pageable pageable) {
-		return transactionRepository.findByDashboard(dashboard, pageable);
-	}
-
-	@Override
-	public List<Transaction> findByDate(Integer pageNo, Integer pageSize) {
-		
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("cashier"));
- 
-        Page<Transaction> pagedResult = transactionRepository.findAll(paging);
-         
-        if(pagedResult.hasContent()) {
-            return pagedResult.getContent();
-        } else {
-            return new ArrayList<Transaction>();
-        }
+	public Page<Transaction> findAll(Dashboard dashboard, Predicate parameters, Pageable pageable) {
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
+		return transactionRepository.findAll(flatmateLogged, dashboard, parameters, pageable);
 	}
 
 	@Override

@@ -2,9 +2,8 @@ package br.com.housecash.backend.exception;
 
 import br.com.housecash.backend.model.Flatmate;
 import lombok.Getter;
-import lombok.Setter;
 
-@Setter @Getter
+@Getter
 public class AccessDeniedException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

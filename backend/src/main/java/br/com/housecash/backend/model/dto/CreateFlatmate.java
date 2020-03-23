@@ -4,10 +4,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import br.com.housecash.backend.handler.annotation.DTO;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @DTO
-@Data
+@Getter @Setter
 public class CreateFlatmate {
 
     @NotNull

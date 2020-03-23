@@ -3,11 +3,12 @@ package br.com.housecash.backend.service;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+
+import com.querydsl.core.types.Predicate;
 
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
@@ -18,13 +19,9 @@ public interface TransactionService {
 	
 	public List<Transaction> findAll(Dashboard dashboard);
 	
-	public Collection<Transaction> findAll(Dashboard dashboard, Map<String,String> parameters);
-	
-	public Page<Transaction> findAll(Dashboard dashboard, Pageable pageable);
+	public Page<Transaction> findAll(Dashboard dashboard, Predicate parameters, Pageable pageable);
 
 	public Transaction findById(Dashboard dashboard, Long id);
-	
-	public List<Transaction> findByDate(Integer pageNo, Integer pageSize);
 	
 	public Collection<Transaction> findByCashierReferences(Dashboard dashboard, Cashier cashier);
 	

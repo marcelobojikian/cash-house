@@ -4,10 +4,9 @@ import java.time.LocalDateTime;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Builder
-@Setter @Getter
+@Getter
 public class ErrorResponse {
 
     private LocalDateTime timestamp;

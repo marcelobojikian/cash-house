@@ -1,12 +1,7 @@
 package br.com.housecash.backend.controller;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -15,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.querydsl.core.types.Predicate;
+
+import br.com.housecash.backend.controller.dto.TransactionSearch;
+import br.com.housecash.backend.controller.helper.SeachListResponse;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.NoContentException;
 import br.com.housecash.backend.handler.annotation.RequestDTO;
@@ -41,7 +41,6 @@ import br.com.housecash.backend.model.Transaction;
 import br.com.housecash.backend.model.dto.Content;
 import br.com.housecash.backend.model.dto.CreateTransaction;
 import br.com.housecash.backend.model.dto.UpdateTransaction;
-import br.com.housecash.backend.security.annotation.UserLogged;
 import br.com.housecash.backend.service.CashierService;
 import br.com.housecash.backend.service.FlatmateService;
 import br.com.housecash.backend.service.TransactionService;
@@ -64,66 +63,34 @@ public class TransactionController {
 
 	@GetMapping("")
 	@ApiOperation(value = "Return a list with all transactions", response = Transaction[].class)
-	public List<Transaction> findAll(@ApiIgnore Dashboard dashboard) {
-		return transactionService.findAll(dashboard);
-	}
-
-	@GetMapping("/group")
-	public List<Content<Transaction>> findAllGroupByDate(
+	public ResponseEntity<?> findAll(
 			@ApiIgnore Dashboard dashboard,
-			@RequestParam Map<String,String> parameters) {
+			@ApiIgnore @QuerydslPredicate(bindings = TransactionSearch.class, root = Transaction.class) Predicate predicate, 
+			@ApiIgnore Pageable pageable,
+			@RequestParam(required = false, defaultValue = "none") String group) {
 		
-		Collection<Transaction> transactions = transactionService.findAll(dashboard, parameters);
+		Page<Transaction> result = transactionService.findAll(dashboard, predicate, pageable);
+    	
+        long totalElements = result.getTotalElements();
+        int numberOfElements = result.getNumberOfElements();
+        
+        if (result.getContent().isEmpty()) {
+	        return new ResponseEntity<Page<Content<Transaction>>>(HttpStatus.NO_CONTENT);
+	    }
+        
+        HttpStatus httpStatus = numberOfElements < totalElements ? HttpStatus.PARTIAL_CONTENT : HttpStatus.OK;
 		
-		Map<LocalDate, List<Transaction>> groupedByDate = transactions.stream()
-				.collect(Collectors.groupingBy(item -> item.getCreatedDate().toLocalDate()));
-		
-		List<Content<Transaction>> list = new ArrayList<Content<Transaction>>();
-		for (Map.Entry<LocalDate,List<Transaction>> entry : groupedByDate.entrySet()) {  
-			list.add(new Content<Transaction>(entry.getKey(),entry.getValue()));
+		if(group.equals("createdDate")) {
+		        
+			List<Content<Transaction>> list = SeachListResponse.groupByCreatedDate(result);
+			Page<Content<Transaction>> pageFormated = new PageImpl<Content<Transaction>>(list, pageable, Long.valueOf(list.size()));
+
+            return new ResponseEntity<Page<Content<Transaction>>>(pageFormated, httpStatus);
+			
+		}else {
+			return new ResponseEntity<Page<Transaction>>(result, httpStatus);
 		}
 		
-		return list;
-	}
-
-	@GetMapping("/group/paged")
-	public List<Content<Transaction>> findAllGroupByDateAndPaged(
-			@ApiIgnore Dashboard dashboard, Pageable pageable) {
-		
-		Page<Transaction> pages = transactionService.findAll(dashboard, pageable);
-		
-		Map<LocalDate, List<Transaction>> groupedByDate = pages.stream()
-				.collect(Collectors.groupingBy(item -> item.getCreatedDate().toLocalDate()));
-		
-		List<Content<Transaction>> list = new ArrayList<Content<Transaction>>();
-		for (Map.Entry<LocalDate,List<Transaction>> entry : groupedByDate.entrySet()) {  
-			list.add(new Content<Transaction>(entry.getKey(),entry.getValue()));
-		}
-		
-		return list;
-	}
-
-	@GetMapping("/group/paged/assembler")
-	public Object findAllGroupDate(
-			@UserLogged Flatmate flatmateLogged,
-			@ApiIgnore Dashboard dashboard, 
-			Pageable pageable, 
-			PagedResourcesAssembler<Content<Transaction>> assembler) {
-		
-		Page<Transaction> pages = transactionService.findAll(dashboard, pageable);
-		
-		Map<LocalDate, List<Transaction>> groupedByDate = pages.stream()
-				.collect(Collectors.groupingBy(item -> item.getCreatedDate().toLocalDate()));
-		
-		List<Content<Transaction>> list = new ArrayList<Content<Transaction>>();
-		for (Map.Entry<LocalDate,List<Transaction>> entry : groupedByDate.entrySet()) {  
-			list.add(new Content<Transaction>(entry.getKey(),entry.getValue()));
-		}
-
-		Page<Content<Transaction>> result = new PageImpl<Content<Transaction>>(list, pageable, Long.valueOf(list.size()));
-
-		return assembler.toResource(result);
-
 	}
 
 	@GetMapping("/{id}")

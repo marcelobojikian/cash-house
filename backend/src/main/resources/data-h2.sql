@@ -41,7 +41,7 @@ INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, acti
 INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (6, 1, 3, 1, 'DELETED', 'DEPOSIT', 61.30, '2020-01-28 23:59:59');
 INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (7, 8, 8, 3, 'SENDED', 'WITHDRAW', 1.50, '2020-01-28 23:59:59');
 INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (8, 8, 9, 3, 'CANCELED', 'DEPOSIT', 8.88, '2020-01-28 23:59:59');
-INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (9, 10, 10, 3, 'SENDED', 'WITHDRAW', 9.41, '2020-01-28 23:59:59');
+INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (9, 10, 10, 3, 'CREATED', 'WITHDRAW', 9.41, '2020-01-28 23:59:59');
 INSERT INTO TRANSACTION (id, create_by_id, assigned_id, cashier_id, status, action, value, created_at) VALUES (10, 9, 9, 3, 'SENDED', 'DEPOSIT', 20, '2020-01-28 23:59:59');
 
 INSERT INTO DASHBOARD_TRANSACTION (ID_DASHBOARD, ID_TRANSACTION) VALUES (1, 1);

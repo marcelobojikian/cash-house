@@ -133,10 +133,10 @@ public class CashierServiceImpl implements CashierService {
 
 		log.info(String.format("Action %s in a Cashier %s current balance %s", transaction.getAction(), cashierId, cashier.getBalance()));
 		
-		if(transaction.getAction().equals(Action.DEPOSIT)) {
-			cashier.deposit(transaction.getValue());
-		} else if(transaction.getAction().equals(Action.WITHDRAW)) {
+		if(transaction.getAction().equals(Action.WITHDRAW)) {
 			cashier.withdraw(transaction.getValue());
+		} else {
+			cashier.deposit(transaction.getValue());
 		}
 		
 		log.info(String.format("Changed balance by %s", cashier.getBalance()));
