@@ -1,4 +1,4 @@
-package br.com.housecash.backend.model.dto;
+package br.com.housecash.backend.controller.dto;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -8,9 +8,11 @@ import lombok.Setter;
 
 @DTO
 @Getter @Setter
-public class Propertie {
-	
+public class UpdateFlatmate {
+
     @NotEmpty
-	String value;
+	String nickname;
+
+	String password;
 
 }

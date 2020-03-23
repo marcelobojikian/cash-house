@@ -29,7 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.querydsl.core.types.Predicate;
 
-import br.com.housecash.backend.controller.dto.TransactionSearch;
+import br.com.housecash.backend.controller.dto.Content;
+import br.com.housecash.backend.controller.dto.CreateTransaction;
+import br.com.housecash.backend.controller.dto.UpdateTransaction;
 import br.com.housecash.backend.controller.helper.SeachListResponse;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.NoContentException;
@@ -38,9 +40,7 @@ import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
-import br.com.housecash.backend.model.dto.Content;
-import br.com.housecash.backend.model.dto.CreateTransaction;
-import br.com.housecash.backend.model.dto.UpdateTransaction;
+import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.service.CashierService;
 import br.com.housecash.backend.service.FlatmateService;
 import br.com.housecash.backend.service.TransactionService;
@@ -65,7 +65,7 @@ public class TransactionController {
 	@ApiOperation(value = "Return a list with all transactions", response = Transaction[].class)
 	public ResponseEntity<?> findAll(
 			@ApiIgnore Dashboard dashboard,
-			@ApiIgnore @QuerydslPredicate(bindings = TransactionSearch.class, root = Transaction.class) Predicate predicate, 
+			@ApiIgnore @QuerydslPredicate(root = Transaction.class) Predicate predicate, 
 			@ApiIgnore Pageable pageable,
 			@RequestParam(required = false, defaultValue = "none") String group) {
 		

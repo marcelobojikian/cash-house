@@ -1,9 +1,8 @@
-package br.com.housecash.backend.model.dto;
+package br.com.housecash.backend.controller.dto;
 
 import java.math.BigDecimal;
 
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
@@ -14,16 +13,30 @@ import lombok.Setter;
 
 @DTO
 @Getter @Setter
-public class CreateTransaction {
-	
-    @NotNull
-    private Long cashier;
-	
-    private Long assigned;
+public class UpdateTransaction {
 
-    @NotNull
+	private Long assigned;
+	
+    private Long cashier;
+
 	@NumberFormat(style=Style.CURRENCY)
 	@Digits(integer = 10, fraction = 2)
     private BigDecimal value;
+	
+	public boolean haveFlatmateAssigned() {
+		return assigned != null;
+	}
+	
+	public boolean changeCashier() {
+		return cashier != null;
+	}
+	
+	public boolean changeValue() {
+		return value != null;
+	}
+	
+	public boolean haveChanges() {
+		return assigned != null || cashier != null || value != null;
+	}
 
 }

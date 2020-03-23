@@ -1,4 +1,4 @@
-package br.com.housecash.backend.model.dto;
+package br.com.housecash.backend.controller.dto;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

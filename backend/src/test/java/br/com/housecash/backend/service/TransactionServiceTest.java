@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -519,12 +517,6 @@ public class TransactionServiceTest  extends ServiceHelper {
 		
 	}
 
-//
-//	@Test
-//	public void testUpdateFlatmateAssigned() {
-//		fail("Not yet implemented");
-//	}
-
 	@Test
 	public void whenUpdateFlatmateAssigned_thenReturnVoid() throws Exception {
 		
@@ -925,21 +917,6 @@ public class TransactionServiceTest  extends ServiceHelper {
 		
 	}
 	
-//	@Test
-//	public void testFindAllDashboardMapOfStringString() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testFindAllDashboardPageable() {
-//		fail("Not yet implemented");
-//	}
-//
-//	@Test
-//	public void testFindByDate() {
-//		fail("Not yet implemented");
-//	}
-	
 	@Test
 	public void whenFindAllPageable_thenReturnObjectArray() throws Exception {
 		
@@ -953,9 +930,9 @@ public class TransactionServiceTest  extends ServiceHelper {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 		
-        List<Transaction> cashiers = transactionService.findAll(dashboard);
+        List<Transaction> transactions = transactionService.findAll(dashboard);
 		
-		assert(cashiers).contains(transaction);
+		assert(transactions).contains(transaction);
 		
 	}
 

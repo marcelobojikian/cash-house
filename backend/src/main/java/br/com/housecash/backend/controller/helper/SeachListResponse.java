@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 
+import br.com.housecash.backend.controller.dto.Content;
 import br.com.housecash.backend.model.Transaction;
-import br.com.housecash.backend.model.dto.Content;
 
 public class SeachListResponse {
 	

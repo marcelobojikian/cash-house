@@ -2,17 +2,31 @@ package br.com.housecash.backend.handler;
 
 import java.time.LocalDateTime;
 
-import lombok.Builder;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+
 import lombok.Getter;
 
-@Builder
 @Getter
 public class ErrorResponse {
-
+	
     private LocalDateTime timestamp;
+
+    private String path;
     private Integer status;
     private String error;
     private String message;
-    private String path;
+    
+	public ErrorResponse(HttpServletRequest request, HttpStatus status, String message) {
+		super();
+		this.path = request.getServletPath();
+		this.status = status.value();
+		this.error = status.getReasonPhrase();
+		this.message = message;
+		this.timestamp = LocalDateTime.now();
+	}
+    
+    
 
 }
