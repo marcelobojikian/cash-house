@@ -876,13 +876,6 @@ public class TransactionServiceTest  extends ServiceHelper {
         transactionService.findByCashierReferences(dashboard, energy);
 		
 	}
-//
-//	@Test
-//	public void testDeleteDashboardLong() {
-//		fail("Not yet implemented");
-//	}
-	
-
 	
 	@Test
 	public void whenDelete_thenReturnVoid() throws Exception {
@@ -946,5 +939,24 @@ public class TransactionServiceTest  extends ServiceHelper {
 //	public void testFindByDate() {
 //		fail("Not yet implemented");
 //	}
+	
+	@Test
+	public void whenFindAllPageable_thenReturnObjectArray() throws Exception {
+		
+		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Dashboard dashboard = flatmate.getDashboard();
+
+		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
+		
+		Transaction transaction = createTransaction(dashboard, 1l, 2.33, Status.CREATED, Action.WITHDRAW);
+		transaction.setCreateBy(flatmate);
+		transaction.setAssigned(flatmate);
+		transaction.setCashier(energy);
+		
+        List<Transaction> cashiers = transactionService.findAll(dashboard);
+		
+		assert(cashiers).contains(transaction);
+		
+	}
 
 }

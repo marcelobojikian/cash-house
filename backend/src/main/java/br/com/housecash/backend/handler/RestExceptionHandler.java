@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import br.com.housecash.backend.exception.AccessDeniedException;
 import br.com.housecash.backend.exception.EntityNotFoundException;
-import br.com.housecash.backend.exception.InvalidFieldException;
 import br.com.housecash.backend.exception.InvalidOperationException;
 import br.com.housecash.backend.exception.NoContentException;
 import br.com.housecash.backend.model.Transaction;
@@ -52,12 +51,6 @@ public class RestExceptionHandler {
 		
 		return buildResponse(message, HttpStatus.BAD_REQUEST);
 
-	}
-
-	@ExceptionHandler(InvalidFieldException.class)
-	public ResponseEntity<ErrorResponse> invalidFieldException(InvalidFieldException ex) {
-		String message = localeService.getMessage("field.invalid", ex.getValue());
-		return buildResponse(message, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(NoContentException.class)

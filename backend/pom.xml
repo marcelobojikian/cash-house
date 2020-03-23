@@ -20,6 +20,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<querydsl.version>4.3.0</querydsl.version>
 	</properties>
 
 	<dependencies>
@@ -120,6 +121,19 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.9.2</version>
 		</dependency>
+ 
+	    <dependency>
+	        <groupId>com.querydsl</groupId>
+	        <artifactId>querydsl-apt</artifactId>
+	        <version>${querydsl.version}</version>
+	        <scope>provided</scope>
+	    </dependency>
+	 
+	    <dependency>
+	        <groupId>com.querydsl</groupId>
+	        <artifactId>querydsl-jpa</artifactId>
+	        <version>${querydsl.version}</version>
+	    </dependency>
 
 	</dependencies>
 
@@ -151,13 +165,8 @@
                 <configuration>
 				    <excludes>
 				        <exclude>**/*br/com/housecash/backend/model/**</exclude>
-				        <exclude>**/*br/com/housecash/backend/exception/**</exclude>
-				        <exclude>**/*br/com/housecash/backend/handler/**</exclude>
-				        <exclude>**/*br/com/housecash/backend/repository/**</exclude>
-				        <exclude>**/*br/com/housecash/backend/security/**</exclude>
+				        <exclude>**/*br/com/housecash/backend/security/H2ConfigConsole.class</exclude>
 				        <exclude>**/*br/com/housecash/backend/App.class</exclude>
-				        <exclude>**/*br/com/housecash/backend/SpringFoxConfig.class</exclude>
-				        <exclude>**/*br/com/housecash/backend/WebConfig.class</exclude>
 				    </excludes>
 				</configuration>
             	<executions>
@@ -175,6 +184,23 @@
 				   </execution>
 				</executions>
         	</plugin>
+        	
+        	<plugin>
+			    <groupId>com.mysema.maven</groupId>
+			    <artifactId>apt-maven-plugin</artifactId>
+			    <version>1.1.3</version>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>process</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>target/generated-sources/java</outputDirectory>
+			                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 
 		</plugins>
 		
