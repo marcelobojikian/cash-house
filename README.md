@@ -49,5 +49,7 @@ If face an issue, please notify it [here](https://github.com/marcelobojikian/cas
 
 ## License
 
-All code in this repository is under the MIT license as specified by the LICENSE file.
+Cash House is licensed under The MIT License (MIT). Which means that you can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software. But you always need to state that Cash House is the original author of this template.
+
+Project is developed and maintained by Marcelo Nogueira Bojikian
 
