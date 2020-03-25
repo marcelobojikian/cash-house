@@ -1,5 +1,5 @@
 # About
-A management system / common payment savings in shared houses where all the members of the house must contribute money for specific accounts such as energy, water, electricity, food and others.
+Cash House has the purpose of managing one or more savings cashiers, very common at shared home where all the members of the house must contribute money for specific accounts such as energy, water, electricity, food and others. The project is divided into 2 parts, the first is the java server that is responsible for managing all the transactions, flatmates and savings banks, through the server it is possible to make rest requests for all the client-side interfaces. The second part is the mobile application with a friendly interface for the to make operations such as deposit and withdrawal of money in savings cashiers.
 
 ## Backand project
 
