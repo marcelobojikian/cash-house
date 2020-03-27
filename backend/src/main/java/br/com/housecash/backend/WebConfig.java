@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import br.com.housecash.backend.converter.ActionToEnumConverter;
 import br.com.housecash.backend.converter.StatusToEnumConverter;
-import br.com.housecash.backend.handler.DTOMethodProcessor;
 import br.com.housecash.backend.handler.DashboardArgumentResolver;
 
 @Configuration
@@ -18,13 +17,9 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Autowired
 	private DashboardArgumentResolver dashboardArgumentResolver;
-	
-	@Autowired
-	private DTOMethodProcessor dtoMethodProcessor;
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		argumentResolvers.add(dtoMethodProcessor);
 		argumentResolvers.add(dashboardArgumentResolver);
 	}
 	

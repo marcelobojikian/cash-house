@@ -8,11 +8,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
-import br.com.housecash.backend.handler.annotation.DTO;
 import lombok.Getter;
 import lombok.Setter;
 
-@DTO
 @Getter @Setter
 public class CreateTransaction {
 	

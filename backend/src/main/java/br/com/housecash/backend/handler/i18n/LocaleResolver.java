@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
@@ -19,7 +20,7 @@ public class LocaleResolver extends AcceptHeaderLocaleResolver {
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
-		String language = request.getHeader("Accept-Language");
+		String language = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
 		log.debug("language parameter: " + language);
 		if (language == null || language.isEmpty()) {
 			log.debug("language(default): " + Locale.getDefault());

@@ -33,7 +33,7 @@ import br.com.housecash.backend.security.service.AuthenticationFacade;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TransactionServiceTest  extends ServiceHelper {
+public class TransactionServiceTest extends ServiceHelper {
 
 	@Autowired
 	private TransactionService transactionService;

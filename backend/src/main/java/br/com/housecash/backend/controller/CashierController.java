@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.controller.dto.CreateCashier;
 import br.com.housecash.backend.controller.dto.UpdateCashier;
-import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.service.CashierService;
@@ -53,7 +52,7 @@ public class CashierController {
 	@ApiOperation(value = "Return a cashier entity created", response = Cashier.class)
 	public Cashier create(
 			@ApiIgnore Dashboard dashboard, 
-			@RequestDTO(CreateCashier.class) @Valid CreateCashier cashier) {
+			@RequestBody @Valid CreateCashier cashier) {
 		
 		String name = cashier.getName();
 		BigDecimal started = cashier.getStarted();
@@ -81,7 +80,7 @@ public class CashierController {
 	public Cashier patch(
 			@ApiIgnore Dashboard dashboard, 
 			@PathVariable Long id,
-			@RequestDTO(UpdateCashier.class) @Valid UpdateCashier cashier) throws Exception {
+			@RequestBody @Valid UpdateCashier cashier) throws Exception {
 
 		String name = cashier.getName();
 		return cashierService.update(dashboard, id, name);
