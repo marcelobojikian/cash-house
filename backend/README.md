@@ -15,7 +15,7 @@ The server can be easily run on any operating system such as Linux or Windows, f
 When executing the project it is possible to view the documentation of the resources that can be consumed by the link http://localhost:8080/swagger-ui.html, see an example:
 
 <p align="center">
- <img src="images/Swagger2.png" width="600" height="500">
+ <img src="../images/Swagger2.png" width="600" height="500">
 </p>
 
 ## Tools and Technologies to be used
