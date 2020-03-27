@@ -1,13 +1,10 @@
 package br.com.housecash.backend.handler;
 
-import java.time.LocalDateTime;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -21,7 +18,6 @@ import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.InvalidOperationException;
 import br.com.housecash.backend.exception.NoContentException;
 import br.com.housecash.backend.model.Transaction;
-import br.com.housecash.backend.model.Transaction.Action;
 import br.com.housecash.backend.model.Transaction.Status;
 import br.com.housecash.backend.service.LocaleService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +42,7 @@ public class RestExceptionHandler {
 
 		BindingResult result = e.getBindingResult();
 		FieldError fieldError = result.getFieldErrors().iterator().next();
-		
+
 		String message = localeService.getMessage("dto.field.invalid", fieldError.getField(), fieldError.getDefaultMessage());
 		
 		return buildResponse(message, HttpStatus.BAD_REQUEST);
@@ -64,16 +60,7 @@ public class RestExceptionHandler {
 
 		Transaction transaction = ex.getTransaction();
 		Status status = ex.getStatus();
-		Action action = ex.getAction();
-		String message = null;
-
-		if (status != null) {
-			message = localeService.getMessage("Transaction.action.invalid.operation", transaction.getId(), status);
-		} else if (action != null) {
-			message = localeService.getMessage("Transaction.status.invalid.operation", transaction.getId(), action);
-		} else {
-			message = localeService.getMessage("Transaction.invalid.operation", transaction.getId());
-		}
+		String message = localeService.getMessage("Transaction.status.invalid.operation", transaction.getId(), status);;
 
 		return buildResponse(message, HttpStatus.METHOD_NOT_ALLOWED);
 	}
@@ -116,11 +103,6 @@ public class RestExceptionHandler {
 	@ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
 	public ResponseEntity<ErrorResponse> entityAccessDeniedHandler(org.springframework.security.access.AccessDeniedException ex) {
 		return buildResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
-	}
-
-	@ExceptionHandler(EmptyResultDataAccessException.class)
-	public ResponseEntity<ErrorResponse> entityEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
-		return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {

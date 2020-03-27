@@ -35,12 +35,10 @@ import br.com.housecash.backend.controller.dto.UpdateTransaction;
 import br.com.housecash.backend.controller.helper.SeachListResponse;
 import br.com.housecash.backend.exception.EntityNotFoundException;
 import br.com.housecash.backend.exception.NoContentException;
-import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.model.Transaction;
-import br.com.housecash.backend.repository.TransactionRepository;
 import br.com.housecash.backend.service.CashierService;
 import br.com.housecash.backend.service.FlatmateService;
 import br.com.housecash.backend.service.TransactionService;
@@ -51,6 +49,9 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/transactions")
 @PreAuthorize("hasAnyRole('USER')")
 public class TransactionController {
+	
+	@Autowired
+	private SeachListResponse responseHelper;
 
 	@Autowired
 	private CashierService cashierService; 
@@ -82,7 +83,7 @@ public class TransactionController {
 		
 		if(group.equals("createdDate")) {
 		        
-			List<Content<Transaction>> list = SeachListResponse.groupByCreatedDate(result);
+			List<Content<Transaction>> list = responseHelper.groupByCreatedDate(result);
 			Page<Content<Transaction>> pageFormated = new PageImpl<Content<Transaction>>(list, pageable, Long.valueOf(list.size()));
 
             return new ResponseEntity<Page<Content<Transaction>>>(pageFormated, httpStatus);
@@ -104,7 +105,7 @@ public class TransactionController {
 	@ApiOperation(value = "Returns a created deposit transaction entity", response = Transaction.class)
 	public Transaction createDepoist(
 			@ApiIgnore Dashboard dashboard,
-			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
+			@RequestBody @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
 		Long cashierId = content.getCashier();
@@ -125,7 +126,7 @@ public class TransactionController {
 	@ApiOperation(value = "Returns a created withdraw transaction entity", response = Transaction.class)
 	public Transaction createWithdraw(
 			@ApiIgnore Dashboard dashboard, 
-			@RequestDTO(CreateTransaction.class) @Valid CreateTransaction content) {
+			@RequestBody @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
 		Long cashierId = content.getCashier();
@@ -155,7 +156,7 @@ public class TransactionController {
 	public Transaction patch(
 			@ApiIgnore Dashboard dashboard,
 			@PathVariable @NotNull Long id,
-			@RequestDTO(UpdateTransaction.class) @Valid UpdateTransaction content) {
+			@RequestBody @Valid UpdateTransaction content) {
 		
 		if(!content.haveChanges()) {
 			throw new NoContentException();

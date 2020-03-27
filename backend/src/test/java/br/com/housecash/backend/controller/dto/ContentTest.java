@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.Test;

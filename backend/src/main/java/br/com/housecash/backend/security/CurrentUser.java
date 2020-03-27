@@ -1,6 +1,6 @@
 package br.com.housecash.backend.security;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -13,7 +13,7 @@ public class CurrentUser extends User {
 
     private final Flatmate flatmate;
 
-	public CurrentUser(Flatmate flatmate, Set<GrantedAuthority> grantedAuthorities) {
+	public CurrentUser(Flatmate flatmate, Collection<GrantedAuthority> grantedAuthorities) {
 		super(flatmate.getEmail(), flatmate.getPassword(), grantedAuthorities);
 		this.flatmate = flatmate;
 	}

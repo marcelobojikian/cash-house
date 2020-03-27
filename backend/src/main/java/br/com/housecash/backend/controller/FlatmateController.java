@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.housecash.backend.controller.dto.CreateFlatmate;
 import br.com.housecash.backend.controller.dto.UpdateFlatmate;
 import br.com.housecash.backend.exception.EntityNotFoundException;
-import br.com.housecash.backend.handler.annotation.RequestDTO;
-import br.com.housecash.backend.model.Cashier;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.service.FlatmateService;
@@ -55,7 +53,7 @@ public class FlatmateController {
 	@ApiOperation(value = "Return a flatmate entity created", response = Flatmate.class)
 	public Flatmate create(
 			@ApiIgnore Dashboard dashboard,
-			@RequestDTO(CreateFlatmate.class) @Valid CreateFlatmate flatmate) {
+			@RequestBody @Valid CreateFlatmate flatmate) {
 		
 		String email = flatmate.getEmail();
 		String nickname = flatmate.getNickname();
@@ -76,11 +74,11 @@ public class FlatmateController {
 	}
 
 	@PatchMapping("/{id}")
-	@ApiOperation(value = "Return a flatmate entity partial updated", response = Cashier.class)
+	@ApiOperation(value = "Return a flatmate entity partial updated", response = Flatmate.class)
 	public Flatmate patch(
 			@ApiIgnore Dashboard dashboard,
 			@PathVariable Long id,
-			@RequestDTO(UpdateFlatmate.class) @Valid UpdateFlatmate flatmate) {
+			@RequestBody @Valid UpdateFlatmate flatmate) {
 
 		String nickname = flatmate.getNickname();
 		String password = flatmate.getPassword();

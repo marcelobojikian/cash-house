@@ -20,7 +20,8 @@ public class ErrorResponse {
     
 	public ErrorResponse(HttpServletRequest request, HttpStatus status, String message) {
 		super();
-		this.path = request.getServletPath();
+//		this.path = request.getServletPath();
+		this.path = request.getRequestURI().substring(request.getContextPath().length());
 		this.status = status.value();
 		this.error = status.getReasonPhrase();
 		this.message = message;

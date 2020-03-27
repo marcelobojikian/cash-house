@@ -9,11 +9,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.housecash.backend.controller.dto.Propertie;
-import br.com.housecash.backend.handler.annotation.RequestDTO;
 import br.com.housecash.backend.model.Dashboard;
 import br.com.housecash.backend.model.Flatmate;
 import br.com.housecash.backend.security.annotation.UserLogged;
@@ -50,14 +50,14 @@ public class UserController {
 	@PutMapping("/nickname")
 	@ApiOperation(value = "Return a flatmate entity with update nickname", response = Flatmate.class)
 	public Flatmate updateNickname(@ApiIgnore @UserLogged Flatmate flatmate,
-			@RequestDTO(Propertie.class) @Valid Propertie propertie) {
+			@RequestBody @Valid Propertie propertie) {
 		return userService.changeNickname(flatmate.getId(), propertie.getValue());
 	}
 
 	@PutMapping("/password")
 	@ApiOperation(value = "Return a flatmate entity with update password", response = Flatmate.class)
 	public Flatmate updatePassword(@ApiIgnore @UserLogged Flatmate flatmate,
-			@RequestDTO(Propertie.class) @Valid Propertie propertie) {
+			@RequestBody @Valid Propertie propertie) {
 		return userService.changePassword(flatmate.getId(), propertie.getValue());
 	}
 
