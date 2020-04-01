@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+
+  database:
+    image: postgres:12.2
+    container_name: database_container
+    restart: always
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+            
+  sonarqube:
+    image: sonarqube:8.2-community
+    container_name: sonarqube_container
+    restart: always
+    ports:
+      - 9000:9000
+    environment:
+      LimitNOFILE: 65536
+      LimitNPROC: 4096
+    depends_on:
+      - database
+    env_file:
+      - .env
+ 
+ 
+ 
