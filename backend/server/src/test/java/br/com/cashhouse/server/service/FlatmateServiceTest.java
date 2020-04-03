@@ -1,11 +1,17 @@
 package br.com.cashhouse.server.service;
 
 import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -74,9 +80,9 @@ public class FlatmateServiceTest {
 		when(flatmateRepository.findByEmail("joao@mail.com")).thenReturn(Optional.of(joao));
 		
 		Flatmate flatmate = flatmateService.findByEmail("joao@mail.com");
-		
-		assert(flatmate.getEmail()).equals("joao@mail.com");
-		assert(flatmate.getNickname()).equals("Joao A. M.");
+
+		assertThat(flatmate.getEmail(), is("joao@mail.com"));
+		assertThat(flatmate.getNickname(), is("Joao A. M."));
 		
 	}
 
@@ -102,9 +108,9 @@ public class FlatmateServiceTest {
 		when(flatmateRepository.findByDashboardAndId(dashboard, 2L)).thenReturn(Optional.of(joao));
 		
 		Flatmate flatmate = flatmateService.findById(2L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 2L));
-		
-		assert(flatmate.getEmail()).equals("joao@mail.com");
-		assert(flatmate.getNickname()).equals("Joao A. M.");
+
+		assertThat(flatmate.getEmail(), is("joao@mail.com"));
+		assertThat(flatmate.getNickname(), is("Joao A. M."));
 		
 	}
 
@@ -117,9 +123,9 @@ public class FlatmateServiceTest {
 
 		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		Flatmate flatmate = flatmateService.findById(1L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 1L));
-		
-		assert(flatmate.getEmail()).equals("admin@mail.com");
-		assert(flatmate.getNickname()).equals("Administrator");
+
+		assertThat(flatmate.getEmail(), is("admin@mail.com"));
+		assertThat(flatmate.getNickname(), is("Administrator"));
 		
 	}
 
@@ -147,8 +153,8 @@ public class FlatmateServiceTest {
 		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		
 		List<Flatmate> flatmates = flatmateService.findAll();
-		
-		assert(flatmates).isEmpty();
+
+		assertThat(flatmates, empty());
 		
 	}
 
@@ -164,8 +170,8 @@ public class FlatmateServiceTest {
 		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		
         List<Flatmate> flatmates = flatmateService.findAll();
-		
-		assert(flatmates).contains(joao);
+
+        assertThat(flatmates, contains(joao));
 		
 	}
 
@@ -184,9 +190,9 @@ public class FlatmateServiceTest {
         
         Flatmate flatmate = flatmateService.create("new@mail.com", "new", "password");
 
-		assert(flatmate.getEmail()).equals("new@mail.com");
-		assert(flatmate.getNickname()).equals("new");
-		assert(flatmate.getPassword()).equals("password");
+		assertThat(flatmate.getEmail(), is("new@mail.com"));
+		assertThat(flatmate.getNickname(), is("new"));
+		assertThat(flatmate.getPassword(), is("password"));
 		
 	}
 
@@ -219,9 +225,9 @@ public class FlatmateServiceTest {
         
         Flatmate flatmate = flatmateService.update(2L, newFlatmate);
 
-		assert(flatmate.getEmail()).equals("new@mail.com");
-		assert(flatmate.getNickname()).equals("update");
-		assert(flatmate.getPassword()).equals("new-password");
+		assertThat(flatmate.getEmail(), is("new@mail.com"));
+		assertThat(flatmate.getNickname(), is("update"));
+		assertThat(flatmate.getPassword(), is("new-password"));
 		
 	}
 
@@ -249,9 +255,9 @@ public class FlatmateServiceTest {
         
         Flatmate flatmate = flatmateService.update(2L, "update");
 
-		assert(flatmate.getEmail()).equals("joao@mail.com");
-		assert(flatmate.getNickname()).equals("update");
-		assert(flatmate.getPassword()).equals("password");
+		assertThat(flatmate.getEmail(), is("joao@mail.com"));
+		assertThat(flatmate.getNickname(), is("update"));
+		assertThat(flatmate.getPassword(), is("password"));
 		
 	}
 
@@ -286,9 +292,9 @@ public class FlatmateServiceTest {
         
         Flatmate flatmate = flatmateService.update(2L, "update", "new-password");
 
-		assert(flatmate.getEmail()).equals("joao@mail.com");
-		assert(flatmate.getNickname()).equals("update");
-		assert(flatmate.getPassword()).equals("new-password");
+		assertThat(flatmate.getEmail(), is("joao@mail.com"));
+		assertThat(flatmate.getNickname(), is("update"));
+		assertThat(flatmate.getPassword(), is("new-password"));
 		
 	}
 
@@ -324,6 +330,9 @@ public class FlatmateServiceTest {
 		doNothing().when(dashboardService).removeTransactions(eq(dashboard), anyCollection());
 		
 		flatmateService.delete(1l);
+		
+		verify(dashboardService, times(1)).removeGuest(eq(dashboard), any(Flatmate.class));
+		verify(dashboardService, times(1)).removeTransactions(eq(dashboard), anyCollection());
 		
 	}
 

@@ -1,11 +1,18 @@
 package br.com.cashhouse.server.service;
 
-import static br.com.cashhouse.server.util.EntityFactory.*;
+import static br.com.cashhouse.server.util.EntityFactory.createCashier;
+import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
+import static br.com.cashhouse.server.util.EntityFactory.createTransaction;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -74,12 +81,12 @@ public class CashierServiceTest {
 		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		
-		Cashier CashierExpect = cashierService.findById(1L);
+		Cashier cashierExpect = cashierService.findById(1L);
 		
-		assert(CashierExpect.getId()).equals(1l);
-		assert(CashierExpect.getName()).equals("Energy");
-		assert(CashierExpect.getStarted()).equals(BigDecimal.valueOf(12.3));
-		assert(CashierExpect.getBalance()).equals(BigDecimal.valueOf(12.3));
+		assertThat(cashierExpect.getId(), is(1l));
+		assertThat(cashierExpect.getName(), is("Energy"));
+		assertThat(cashierExpect.getStarted(), is(BigDecimal.valueOf(12.3)));
+		assertThat(cashierExpect.getBalance(), is(BigDecimal.valueOf(12.3)));
 		
 	}
 
@@ -107,9 +114,8 @@ public class CashierServiceTest {
 
 		when(headerRequest.getDashboard()).thenReturn(dashboard);
         List<Cashier> cashiers = cashierService.findAll();
-		
-		assert(cashiers).contains(energy);
-		assert(cashiers).contains(garbage);
+
+        assertThat(cashiers, contains(energy, garbage));
 		
 	}
 	
@@ -127,10 +133,10 @@ public class CashierServiceTest {
 		
 		Cashier cashier = cashierService.create("Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
 		
-		assert(cashier.getId()).equals(1l);
-		assert(cashier.getName()).equals("Energy");
-		assert(cashier.getStarted()).equals(BigDecimal.valueOf(12.3));
-		assert(cashier.getBalance()).equals(BigDecimal.valueOf(12.3));
+		assertThat(cashier.getId(), is(1l));
+		assertThat(cashier.getName(), is("Energy"));
+		assertThat(cashier.getStarted(), is(BigDecimal.valueOf(12.3)));
+		assertThat(cashier.getBalance(), is(BigDecimal.valueOf(12.3)));
 		
 	}
 
@@ -168,10 +174,10 @@ public class CashierServiceTest {
 		
 		Cashier cashier = cashierService.update(1l, energyNew);
 		
-		assert(cashier.getId()).equals(1l);
-		assert(cashier.getName()).equals("Energy UP");
-		assert(cashier.getStarted()).equals(BigDecimal.valueOf(3.1));
-		assert(cashier.getBalance()).equals(BigDecimal.valueOf(3.2));
+		assertThat(cashier.getId(), is(1l));
+		assertThat(cashier.getName(), is("Energy UP"));
+		assertThat(cashier.getStarted(), is(BigDecimal.valueOf(3.1)));
+		assertThat(cashier.getBalance(), is(BigDecimal.valueOf(3.2)));
 		
 	}
 
@@ -225,10 +231,10 @@ public class CashierServiceTest {
 		
 		Cashier cashier = cashierService.update(1l, "Energy UP");
 		
-		assert(cashier.getId()).equals(1l);
-		assert(cashier.getName()).equals("Energy UP");
-		assert(cashier.getStarted()).equals(BigDecimal.valueOf(12.3));
-		assert(cashier.getBalance()).equals(BigDecimal.valueOf(12.3));
+		assertThat(cashier.getId(), is(1l));
+		assertThat(cashier.getName(), is("Energy UP"));
+		assertThat(cashier.getStarted(), is(BigDecimal.valueOf(12.3)));
+		assertThat(cashier.getBalance(), is(BigDecimal.valueOf(12.3)));
 		
 	}
 
@@ -282,6 +288,9 @@ public class CashierServiceTest {
 		
 		cashierService.delete(1l);
 		
+		verify(dashboardService, times(1)).removeCashier(dashboard, energy);
+		verify(dashboardService, times(1)).removeTransactions(eq(dashboard), anyCollection());
+		
 	}
 
 	@Test(expected = EntityNotFoundException.class)
@@ -333,6 +342,8 @@ public class CashierServiceTest {
 		
 		cashierService.applyTransaction(transaction);
 		
+		verify(cashierRepository, times(1)).save(any(Cashier.class));
+		
 	}
 	
 	@Test
@@ -352,6 +363,8 @@ public class CashierServiceTest {
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
 		cashierService.applyTransaction(transaction);
+		
+		verify(cashierRepository, times(1)).save(any(Cashier.class));
 		
 	}
 	

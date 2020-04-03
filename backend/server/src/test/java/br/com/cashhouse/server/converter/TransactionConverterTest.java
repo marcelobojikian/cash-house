@@ -1,6 +1,7 @@
 package br.com.cashhouse.server.converter;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,19 +24,19 @@ public class TransactionConverterTest {
 	@Test
 	public void whenConvertStringToStatus_thenSuccess() {
 
-		assertEquals(conversionService.convert("created", Status.class),Status.CREATED);
-		assertEquals(conversionService.convert("sended", Status.class),Status.SENDED);
-		assertEquals(conversionService.convert("finished", Status.class),Status.FINISHED);
-		assertEquals(conversionService.convert("canceled", Status.class),Status.CANCELED);
-		assertEquals(conversionService.convert("deleted", Status.class),Status.DELETED);
+		assertThat(conversionService.convert("created", Status.class), is(Status.CREATED));
+		assertThat(conversionService.convert("sended", Status.class), is(Status.SENDED));
+		assertThat(conversionService.convert("finished", Status.class), is(Status.FINISHED));
+		assertThat(conversionService.convert("canceled", Status.class), is(Status.CANCELED));
+		assertThat(conversionService.convert("deleted", Status.class), is(Status.DELETED));
 		
 	}
 
 	@Test
 	public void whenConvertStringToAction_thenSuccess() {
 
-		assertEquals(conversionService.convert("deposit", Action.class),Action.DEPOSIT);
-		assertEquals(conversionService.convert("withdraw", Action.class),Action.WITHDRAW);
+		assertThat(conversionService.convert("deposit", Action.class), is(Action.DEPOSIT));
+		assertThat(conversionService.convert("withdraw", Action.class), is(Action.WITHDRAW));
 		
 	}
 

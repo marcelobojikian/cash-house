@@ -1,14 +1,23 @@
 package br.com.cashhouse.server.service;
 
-import static br.com.cashhouse.server.util.EntityFactory.*;
-import static org.junit.Assert.assertEquals;
+import static br.com.cashhouse.server.util.EntityFactory.createCashier;
+import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
+import static br.com.cashhouse.server.util.EntityFactory.createTransaction;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -86,13 +95,13 @@ public class TransactionServiceTest {
 		
 		Transaction transactionFound = transactionService.findById(1L);
 		
-		assert(transactionFound.getId()).equals(1l);
-		assert(transactionFound.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionFound.getStatus()).equals(Status.CREATED);
-		assert(transactionFound.getAction()).equals(Action.WITHDRAW);
-		assert(transactionFound.getCreateBy()).equals(flatmate);
-		assert(transactionFound.getAssigned()).equals(flatmate);
-		assert(transactionFound.getCashier()).equals(energy);
+		assertThat(transactionFound.getId(), is(1l));
+		assertThat(transactionFound.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionFound.getStatus(), is(Status.CREATED));
+		assertThat(transactionFound.getAction(), is(Action.WITHDRAW));
+		assertThat(transactionFound.getCreateBy(), is(flatmate));
+		assertThat(transactionFound.getAssigned(), is(flatmate));
+		assertThat(transactionFound.getCashier(), is(energy));
 		
 	}
 
@@ -122,9 +131,9 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 		
-        List<Transaction> cashiers = transactionService.findAll(dashboard);
-		
-		assert(cashiers).contains(transaction);
+        List<Transaction> transactions = transactionService.findAll(dashboard);
+
+        assertThat(transactions, contains(transaction));
 		
 	}
 	
@@ -142,16 +151,16 @@ public class TransactionServiceTest {
 		
         transactionService.createDeposit(energy, BigDecimal.valueOf(2.33));
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 		
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.DEPOSIT);
-		assert(transactionCreated.getCreateBy()).equals(flatmate);
-		assert(transactionCreated.getAssigned()).equals(flatmate);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.DEPOSIT));
+		assertThat(transactionCreated.getCreateBy(), is(flatmate));
+		assertThat(transactionCreated.getAssigned(), is(flatmate));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 	
@@ -171,16 +180,16 @@ public class TransactionServiceTest {
 		
         transactionService.createDeposit(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 		
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.DEPOSIT);
-		assert(transactionCreated.getCreateBy()).equals(flatmate);
-		assert(transactionCreated.getAssigned()).equals(flatmateAssign);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.DEPOSIT));
+		assertThat(transactionCreated.getCreateBy(), is(flatmate));
+		assertThat(transactionCreated.getAssigned(), is(flatmateAssign));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 
@@ -215,16 +224,16 @@ public class TransactionServiceTest {
 		
         transactionService.createwithdraw(energy, BigDecimal.valueOf(2.33));
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 		
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.WITHDRAW);
-		assert(transactionCreated.getCreateBy()).equals(flatmate);
-		assert(transactionCreated.getAssigned()).equals(flatmate);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.WITHDRAW));
+		assertThat(transactionCreated.getCreateBy(), is(flatmate));
+		assertThat(transactionCreated.getAssigned(), is(flatmate));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 	
@@ -244,16 +253,16 @@ public class TransactionServiceTest {
 		
         transactionService.createwithdraw(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 		
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.WITHDRAW);
-		assert(transactionCreated.getCreateBy()).equals(flatmate);
-		assert(transactionCreated.getAssigned()).equals(flatmateAssign);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.WITHDRAW));
+		assertThat(transactionCreated.getCreateBy(), is(flatmate));
+		assertThat(transactionCreated.getAssigned(), is(flatmateAssign));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 
@@ -296,17 +305,17 @@ public class TransactionServiceTest {
 
         transactionService.update(1l, transaction);
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 
-		assert(transactionCreated.getId()).equals(1l);
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.WITHDRAW);
-		assert(transactionCreated.getCreateBy()).equals(flatmate);
-		assert(transactionCreated.getAssigned()).equals(flatmate);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getId(), is(1l));
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.WITHDRAW));
+		assertThat(transactionCreated.getCreateBy(), is(flatmate));
+		assertThat(transactionCreated.getAssigned(), is(flatmate));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 	
@@ -335,17 +344,17 @@ public class TransactionServiceTest {
 
         transactionService.update(1l, transaction);
 
-		assertEquals(dashboard.getTransactions().size(), 1);
+		assertThat(dashboard.getTransactions(), hasSize(1));
 		
 		Transaction transactionCreated = dashboard.getTransactions().get(0);
 
-		assert(transactionCreated.getId()).equals(1l);
-		assert(transactionCreated.getValue()).equals(BigDecimal.valueOf(2.33));
-		assert(transactionCreated.getStatus()).equals(Status.CREATED);
-		assert(transactionCreated.getAction()).equals(Action.WITHDRAW);
-		assert(transactionCreated.getCreateBy()).equals(flatmateAssign);
-		assert(transactionCreated.getAssigned()).equals(flatmateAssign);
-		assert(transactionCreated.getCashier()).equals(energy);
+		assertThat(transactionCreated.getId(), is(1l));
+		assertThat(transactionCreated.getValue(), is(BigDecimal.valueOf(2.33)));
+		assertThat(transactionCreated.getStatus(), is(Status.CREATED));
+		assertThat(transactionCreated.getAction(), is(Action.WITHDRAW));
+		assertThat(transactionCreated.getCreateBy(), is(flatmateAssign));
+		assertThat(transactionCreated.getAssigned(), is(flatmateAssign));
+		assertThat(transactionCreated.getCashier(), is(energy));
 		
 	}
 
@@ -448,9 +457,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.updateValue(1L, BigDecimal.valueOf(5.71));
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getValue()).equals(BigDecimal.valueOf(5.71));
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getValue(), is(BigDecimal.valueOf(5.71)));
 		
 	}
 
@@ -505,9 +514,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.updateCashier(1L, energy);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getCashier()).equals(energy);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getCashier(), is(energy));
 		
 	}
 
@@ -565,9 +574,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.updateFlatmateAssigned(1L, flatmateAssign);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getAssigned()).equals(flatmateAssign);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getAssigned(), is(flatmateAssign));
 		
 	}
 
@@ -639,9 +648,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.send(transaction);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getStatus()).equals(Status.SENDED);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getStatus(), is(Status.SENDED));
 		
 	}
 
@@ -706,9 +715,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.finish(transaction);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getStatus()).equals(Status.FINISHED);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getStatus(), is(Status.FINISHED));
 		
 	}
 
@@ -772,9 +781,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.cancel(transaction);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getStatus()).equals(Status.CANCELED);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getStatus(), is(Status.CANCELED));
 		
 	}
 
@@ -838,9 +847,9 @@ public class TransactionServiceTest {
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
 		transactionService.delete(transaction);
-		
-		assert(transaction.getId()).equals(1l);
-		assert(transaction.getStatus()).equals(Status.DELETED);
+
+		assertThat(transaction.getId(), is(1l));
+		assertThat(transaction.getStatus(), is(Status.DELETED));
 		
 	}
 
@@ -894,7 +903,9 @@ public class TransactionServiceTest {
 		
 		when(transactionRepository.findByDashboardAndFlatmateRef(any(Dashboard.class), any(Flatmate.class), any(Flatmate.class))).thenReturn(Collections.emptyList());
 		
-        transactionService.findByFlatmateReferences(dashboard, flatmate, flatmate);
+        Collection<Transaction> transactions = transactionService.findByFlatmateReferences(dashboard, flatmate, flatmate);
+
+		assertThat(transactions, empty());
 		
 	}
 	
@@ -908,7 +919,9 @@ public class TransactionServiceTest {
 		
 		when(transactionRepository.findByDashboardAndCashier(any(Dashboard.class), any(Cashier.class))).thenReturn(Collections.emptyList());
 		
-        transactionService.findByCashierReferences(dashboard, energy);
+		Collection<Transaction> transactions = transactionService.findByCashierReferences(dashboard, energy);
+
+		assertThat(transactions, empty());
 		
 	}
 	
@@ -931,6 +944,8 @@ public class TransactionServiceTest {
 		doNothing().when(dashboardService).removeTransaction(dashboard, transaction);
 		
 		transactionService.delete(1l);
+		
+		verify(dashboardService, times(1)).removeTransaction(dashboard, transaction);
 		
 	}
 
@@ -977,8 +992,9 @@ public class TransactionServiceTest {
 		transaction.setCashier(energy);
 		
         List<Transaction> transactions = transactionService.findAll(dashboard);
-		
-		assert(transactions).contains(transaction);
+
+		assertThat(transactions, hasSize(1));
+        assertThat(transactions, contains(transaction));
 		
 	}
 
