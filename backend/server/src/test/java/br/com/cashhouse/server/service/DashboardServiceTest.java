@@ -1,7 +1,13 @@
 package br.com.cashhouse.server.service;
 
-import static br.com.cashhouse.server.util.EntityFactory.*;
-import static org.junit.Assert.assertEquals;
+import static br.com.cashhouse.server.util.EntityFactory.createCashier;
+import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
+import static br.com.cashhouse.server.util.EntityFactory.createTransaction;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -54,12 +60,12 @@ public class DashboardServiceTest {
 		when(dashboardRepository.findById(1l)).thenReturn(Optional.of(dashboard));
 		
 		Dashboard dashboardExpect = dashboardService.findById(1L);
-		
-		assert(dashboardExpect.getId()).equals(1l);
-		assert(dashboardExpect.getOwner()).equals(flatmate);
-		assert(dashboardExpect.getCashiers()).isEmpty();
-		assert(dashboardExpect.getGuests()).isEmpty();
-		assert(dashboardExpect.getTransactions()).isEmpty();
+
+		assertThat(dashboardExpect.getId(), is(1l));
+		assertThat(dashboardExpect.getOwner(), is(flatmate));
+		assertThat(dashboardExpect.getCashiers(), empty());
+		assertThat(dashboardExpect.getGuests(), empty());
+		assertThat(dashboardExpect.getTransactions(), empty());
 		
 	}
 
@@ -81,12 +87,12 @@ public class DashboardServiceTest {
 		when(dashboardRepository.findByOwner(flatmate)).thenReturn(dashboard);
 		
 		Dashboard dashboardExpect = dashboardService.findByOwner(flatmate);
-		
-		assert(dashboardExpect.getId()).equals(1l);
-		assert(dashboardExpect.getOwner()).equals(flatmate);
-		assert(dashboardExpect.getCashiers()).isEmpty();
-		assert(dashboardExpect.getGuests()).isEmpty();
-		assert(dashboardExpect.getTransactions()).isEmpty();
+
+		assertThat(dashboardExpect.getId(), is(1l));
+		assertThat(dashboardExpect.getOwner(), is(flatmate));
+		assertThat(dashboardExpect.getCashiers(), empty());
+		assertThat(dashboardExpect.getGuests(), empty());
+		assertThat(dashboardExpect.getTransactions(), empty());
 		
 	}
 
@@ -98,8 +104,8 @@ public class DashboardServiceTest {
 		when(dashboardRepository.findByMyInvitations(flatmate)).thenReturn(Collections.emptyList());
 		
 		Collection<Dashboard> dashboards = dashboardService.findMyInvitations(flatmate);
-		
-		assert(dashboards).isEmpty();
+
+		assertThat(dashboards, empty());
 		
 	}
 	
@@ -113,7 +119,7 @@ public class DashboardServiceTest {
 		
 		Dashboard dashboardExpect = dashboardService.createDashboard(flatmate);
 
-		assert(dashboardExpect.getOwner()).equals(flatmate);
+		assertThat(dashboardExpect.getOwner(), is(flatmate));
 		
 	}
 	
@@ -133,8 +139,8 @@ public class DashboardServiceTest {
 		
 		dashboardService.removeGuest(dashboard, guest1);
 
-		assertEquals(dashboard.getGuests().size(), 1);
-		assert(dashboard.getGuests()).contains(guest2);
+		assertThat(dashboard.getGuests(), hasSize(1));
+        assertThat(dashboard.getGuests(), contains(guest2));
 		
 	}
 	
@@ -151,8 +157,8 @@ public class DashboardServiceTest {
 		
 		dashboardService.removeCashier(dashboard, garbage);
 
-		assertEquals(dashboard.getCashiers().size(), 1);
-		assert(dashboard.getCashiers()).contains(energy);
+		assertThat(dashboard.getCashiers(), hasSize(1));
+        assertThat(dashboard.getCashiers(), contains(energy));
 		
 	}
 	
@@ -169,8 +175,8 @@ public class DashboardServiceTest {
 		
 		dashboardService.removeTransaction(dashboard, withdraw);
 
-		assertEquals(dashboard.getTransactions().size(), 1);
-		assert(dashboard.getTransactions()).contains(deposit);
+		assertThat(dashboard.getTransactions(), hasSize(1));
+        assertThat(dashboard.getTransactions(), contains(deposit));
 		
 	}
 	
@@ -188,8 +194,8 @@ public class DashboardServiceTest {
 		
 		dashboardService.removeTransactions(dashboard, Arrays.asList(deposit,deposit2));
 
-		assertEquals(dashboard.getTransactions().size(), 1);
-		assert(dashboard.getTransactions()).contains(withdraw);
+		assertThat(dashboard.getTransactions(), hasSize(1));
+        assertThat(dashboard.getTransactions(), contains(withdraw));
 		
 	}
 

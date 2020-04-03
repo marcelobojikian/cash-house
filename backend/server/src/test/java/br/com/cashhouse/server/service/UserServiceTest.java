@@ -1,10 +1,15 @@
 package br.com.cashhouse.server.service;
 
 import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.Test;
@@ -17,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.repository.FlatmateRepository;
 import br.com.cashhouse.server.util.LoginWith;
@@ -57,7 +63,9 @@ public class UserServiceTest {
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(dashboardService.findMyInvitations(any(Flatmate.class))).thenReturn(Collections.emptyList());
 		
-		userService.findInvitations();
+		Collection<Dashboard> dashboards = userService.findInvitations();
+		
+		assertThat(dashboards, empty());
 		
 	}
 
@@ -71,9 +79,9 @@ public class UserServiceTest {
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(flatmate);
 		
 		Flatmate flatmateChanged = userService.changeNickname("new nickname");
-		
-		assert(flatmateChanged.getId()).equals(1l);
-		assert(flatmateChanged.getNickname()).equals("new nickname");
+
+		assertThat(flatmateChanged.getId(), is(1l));
+		assertThat(flatmateChanged.getNickname(), is("new nickname"));
 		
 	}
 
@@ -88,9 +96,9 @@ public class UserServiceTest {
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(flatmate);
 		
 		Flatmate flatmateChanged = userService.changePassword("new password");
-		
-		assert(flatmateChanged.getId()).equals(1l);
-		assert(flatmateChanged.getPassword()).equals("password cripted");
+
+		assertThat(flatmateChanged.getId(), is(1l));
+		assertThat(flatmateChanged.getPassword(), is("password cripted"));
 		
 	}
 
@@ -104,9 +112,9 @@ public class UserServiceTest {
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(flatmate);
 		
 		Flatmate flatmateChanged = userService.finishStepGuest();
-		
-		assert(flatmateChanged.getId()).equals(1l);
-		assert(flatmateChanged.isGuestStep());
+
+		assertThat(flatmateChanged.getId(), is(1l));
+		assertTrue(flatmateChanged.isGuestStep());
 		
 	}
 
@@ -120,9 +128,9 @@ public class UserServiceTest {
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(flatmate);
 		
 		Flatmate flatmateChanged = userService.finishStepFirst();
-		
-		assert(flatmateChanged.getId()).equals(1l);
-		assert(flatmateChanged.isFirstStep());
+
+		assertThat(flatmateChanged.getId(), is(1l));
+		assertTrue(flatmateChanged.isFirstStep());
 		
 	}
 
