@@ -35,6 +35,7 @@ public class ContentHelper {
 		return this;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ContentHelper addParent(String parent, String fieldName, Long value) {
 		if(!content.containsKey(parent)) {
 			content.put(parent, new HashMap<String, Object>());

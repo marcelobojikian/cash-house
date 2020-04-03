@@ -30,7 +30,7 @@ public class Dashboard implements Serializable {
 	@EqualsAndHashCode.Include
     private Long id;
 	
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.MERGE)
     private Flatmate owner;
 
 	@OneToMany(cascade = CascadeType.PERSIST)
@@ -51,6 +51,10 @@ public class Dashboard implements Serializable {
 	
 	public boolean isOwner(Long idFlatmate) {
 		return this.owner.getId().equals(idFlatmate);
+	}
+	
+	public boolean isGuest(Flatmate flatmate) {
+		return this.guests.contains(flatmate);
 	}
 
 }

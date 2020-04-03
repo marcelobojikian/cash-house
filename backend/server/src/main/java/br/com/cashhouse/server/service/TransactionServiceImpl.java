@@ -20,9 +20,13 @@ import br.com.cashhouse.core.repository.TransactionRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.exception.InvalidOperationException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+
+	@Autowired
+	private HeaderRequest headerRequest;
 
 	@Autowired
 	private AuthenticationFacade authenticationFacade;
@@ -40,7 +44,8 @@ public class TransactionServiceImpl implements TransactionService {
 	private TransactionRepository transactionRepository;
 
 	@Override
-	public Transaction findById(Dashboard dashboard, Long id) {
+	public Transaction findById(Long id) {
+		Dashboard dashboard = headerRequest.getDashboard();
 		return transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
 	}
@@ -51,14 +56,16 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Page<Transaction> findAll(Dashboard dashboard, Predicate parameters, Pageable pageable) {
+	public Page<Transaction> findAll(Predicate parameters, Pageable pageable) {
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		return transactionRepository.findAll(flatmateLogged, dashboard, parameters, pageable);
 	}
 
 	@Override
-	public Transaction createDeposit(Dashboard dashboard, Cashier cashier, BigDecimal value) {
+	public Transaction createDeposit(Cashier cashier, BigDecimal value) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		Transaction transaction = new Transaction();
@@ -76,8 +83,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction createDeposit(Dashboard dashboard, Cashier cashier, Flatmate flatmateAssign, BigDecimal value) {
+	public Transaction createDeposit(Cashier cashier, Flatmate flatmateAssign, BigDecimal value) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -99,8 +107,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction createwithdraw(Dashboard dashboard, Cashier cashier, BigDecimal value) {
+	public Transaction createwithdraw(Cashier cashier, BigDecimal value) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		Transaction transaction = new Transaction();
@@ -118,8 +127,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction createwithdraw(Dashboard dashboard, Cashier cashier, Flatmate flatmateAssign, BigDecimal value) {
+	public Transaction createwithdraw(Cashier cashier, Flatmate flatmateAssign, BigDecimal value) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -141,8 +151,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction update(Dashboard dashboard, Long id, Transaction newTransaction) {
+	public Transaction update(Long id, Transaction newTransaction) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -159,7 +170,7 @@ public class TransactionServiceImpl implements TransactionService {
 		if (dashboard.isOwner(assignedId)) {
 			entity.setAssigned(dashboard.getOwner());
 		} else {
-			Flatmate assigned = flatmateService.findById(dashboard, assignedId)
+			Flatmate assigned = flatmateService.findById(assignedId)
 					.orElseThrow(() -> new EntityNotFoundException(Transaction.class, "assigned", assignedId));
 			entity.setAssigned(assigned);
 		}
@@ -167,12 +178,12 @@ public class TransactionServiceImpl implements TransactionService {
 		if (dashboard.isOwner(createById)) {
 			entity.setCreateBy(dashboard.getOwner());
 		} else {
-			Flatmate createBy = flatmateService.findById(dashboard, createById)
+			Flatmate createBy = flatmateService.findById(createById)
 					.orElseThrow(() -> new EntityNotFoundException(Transaction.class, "createBy", createById));
 			entity.setCreateBy(createBy);
 		}
 
-		Cashier cashier = cashierService.findById(dashboard, cashierId);
+		Cashier cashier = cashierService.findById(cashierId);
 		entity.setCashier(cashier);
 
 		entity.setAction(newTransaction.getAction());
@@ -184,7 +195,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updateValue(Dashboard dashboard, Long id, BigDecimal value) {
+	public void updateValue(Long id, BigDecimal value) {
+		
+		Dashboard dashboard = headerRequest.getDashboard();
 
 		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
@@ -200,7 +213,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updateCashier(Dashboard dashboard, Long id, Cashier cashier) {
+	public void updateCashier(Long id, Cashier cashier) {
+		
+		Dashboard dashboard = headerRequest.getDashboard();
 
 		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
@@ -216,8 +231,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updateFlatmateAssigned(Dashboard dashboard, Long id, Flatmate flatmateAssigned) {
-
+	public void updateFlatmateAssigned(Long id, Flatmate flatmateAssigned) {
+		
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -238,7 +254,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction send(Dashboard dashboard, Transaction transaction) {
+	public Transaction send(Transaction transaction) {
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
@@ -259,8 +275,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction finish(Dashboard dashboard, Transaction transaction) {
+	public Transaction finish(Transaction transaction) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -280,8 +297,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction cancel(Dashboard dashboard, Transaction transaction) {
+	public Transaction cancel(Transaction transaction) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.isOwner(flatmateLogged)) {
@@ -301,7 +319,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction delete(Dashboard dashboard, Transaction transaction) {
+	public Transaction delete(Transaction transaction) {
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
@@ -332,8 +350,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void delete(Dashboard dashboard, Long id) {
+	public void delete(Long id) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.getOwner().equals(flatmateLogged)) {

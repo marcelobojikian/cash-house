@@ -16,11 +16,15 @@ import br.com.cashhouse.core.model.Transaction.Action;
 import br.com.cashhouse.core.repository.CashierRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class CashierServiceImpl implements CashierService {
+
+	@Autowired
+	private HeaderRequest headerRequest;
 
 	@Autowired
 	private AuthenticationFacade authenticationFacade; 
@@ -35,18 +39,20 @@ public class CashierServiceImpl implements CashierService {
 	private TransactionService transactionService;
 
 	@Override
-	public Cashier findById(Dashboard dashboard, long id) {
-		return cashierRepository.findByDashboardAndId(dashboard, id).orElseThrow(() -> new EntityNotFoundException(Cashier.class, id));
+	public Cashier findById(long id) {
+		return cashierRepository.findByDashboardAndId(headerRequest.getDashboard(), id).orElseThrow(() -> new EntityNotFoundException(Cashier.class, id));
 	}
 
 	@Override
-	public List<Cashier> findAll(Dashboard dashboard) {
+	public List<Cashier> findAll() {
+		Dashboard dashboard = headerRequest.getDashboard();
 		return dashboard.getCashiers();
 	}
 
 	@Override
-	public Cashier create(Dashboard dashboard, String name, BigDecimal started, BigDecimal balance) {
+	public Cashier create(String name, BigDecimal started, BigDecimal balance) {
 		
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if(!dashboard.getOwner().equals(flatmateLogged)) {
@@ -62,8 +68,9 @@ public class CashierServiceImpl implements CashierService {
 	}
 
 	@Override
-	public Cashier update(Dashboard dashboard, long id, Cashier cashier) {
+	public Cashier update(long id, Cashier cashier) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.getOwner().equals(flatmateLogged)) {
@@ -82,8 +89,9 @@ public class CashierServiceImpl implements CashierService {
 	}
 
 	@Override
-	public Cashier update(Dashboard dashboard, long id, String name) {
+	public Cashier update(long id, String name) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.getOwner().equals(flatmateLogged)) {
@@ -101,8 +109,9 @@ public class CashierServiceImpl implements CashierService {
 
 	@Override
 	@Transactional
-	public void delete(Dashboard dashboard, long id) {
+	public void delete(long id) {
 
+		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		if (!dashboard.getOwner().equals(flatmateLogged)) {

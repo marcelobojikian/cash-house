@@ -9,11 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.server.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/transactions/{id}")
@@ -26,33 +24,33 @@ public class TransactionActionController {
 	@PostMapping("/send")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@ApiOperation(value = "Returns a sent transaction entity", response = Transaction.class)
-	public Transaction send(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		Transaction transaction = transactionService.findById(dashboard, id);
-		return transactionService.send(dashboard, transaction);
+	public Transaction send(@PathVariable Long id) {
+		Transaction transaction = transactionService.findById(id);
+		return transactionService.send(transaction);
 	}
 
 	@PostMapping("/finish")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@ApiOperation(value = "Returns a finished transaction entity", response = Transaction.class)
-	public Transaction finish(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		Transaction transaction = transactionService.findById(dashboard, id);
-		return transactionService.finish(dashboard, transaction);
+	public Transaction finish(@PathVariable Long id) {
+		Transaction transaction = transactionService.findById(id);
+		return transactionService.finish(transaction);
 	}
 
 	@PostMapping("/cancel")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@ApiOperation(value = "Returns a canceled transaction entity", response = Transaction.class)
-	public Transaction cancel(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		Transaction transaction = transactionService.findById(dashboard, id);
-		return transactionService.cancel(dashboard, transaction);
+	public Transaction cancel(@PathVariable Long id) {
+		Transaction transaction = transactionService.findById(id);
+		return transactionService.cancel(transaction);
 	}
 
 	@PostMapping("/delete")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@ApiOperation(value = "Returns a deleted transaction entity", response = Transaction.class)
-	public Transaction delete(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		Transaction transaction = transactionService.findById(dashboard, id);
-		return transactionService.delete(dashboard, transaction);
+	public Transaction delete(@PathVariable Long id) {
+		Transaction transaction = transactionService.findById(id);
+		return transactionService.delete(transaction);
 	}
 
 }

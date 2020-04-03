@@ -17,6 +17,7 @@ import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.server.rest.dto.Propertie;
 import br.com.cashhouse.server.service.UserService;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import br.com.cashhouse.server.spring.annotation.UserLogged;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
@@ -25,6 +26,9 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/users/self")
 @PreAuthorize("hasAnyRole('USER')")
 public class UserController {
+
+	@Autowired
+	private HeaderRequest headerRequest;
 
 	@Autowired
 	private UserService userService;
@@ -37,40 +41,39 @@ public class UserController {
 
 	@GetMapping("/dashboard")
 	@ApiOperation(value = "Return a dashboard entity", response = Dashboard.class)
-	public Dashboard getDashboard(@ApiIgnore Dashboard dashboard) {
-		return dashboard;
+	public Dashboard getDashboard() {
+		return headerRequest.getDashboard();
 	}
 
 	@GetMapping("/invitations")
 	@ApiOperation(value = "Return a list of guest dashboard entities", response = Dashboard[].class)
-	public Collection<Dashboard> getDashboardInvited(@ApiIgnore @UserLogged Flatmate flatmate) {
-		return userService.findInvitations(flatmate.getId());
+	public Collection<Dashboard> getDashboardInvited() {
+		return userService.findInvitations();
 	}
 
 	@PutMapping("/nickname")
 	@ApiOperation(value = "Return a flatmate entity with update nickname", response = Flatmate.class)
-	public Flatmate updateNickname(@ApiIgnore @UserLogged Flatmate flatmate,
-			@RequestBody @Valid Propertie propertie) {
-		return userService.changeNickname(flatmate.getId(), propertie.getValue());
+	public Flatmate updateNickname(@RequestBody @Valid Propertie propertie) {
+		return userService.changeNickname(propertie.getValue());
 	}
 
 	@PutMapping("/password")
 	@ApiOperation(value = "Return a flatmate entity with update password", response = Flatmate.class)
 	public Flatmate updatePassword(@ApiIgnore @UserLogged Flatmate flatmate,
 			@RequestBody @Valid Propertie propertie) {
-		return userService.changePassword(flatmate.getId(), propertie.getValue());
+		return userService.changePassword(propertie.getValue());
 	}
 
 	@PostMapping("/step/guest/finish")
 	@ApiOperation(value = "Return a flatmate entity with guest step completed", response = Flatmate.class)
-	public Flatmate finishStepGuest(@ApiIgnore @UserLogged Flatmate flatmate) {
-		return userService.finishStepGuest(flatmate.getId());
+	public Flatmate finishStepGuest() {
+		return userService.finishStepGuest();
 	}
 
 	@PostMapping("/step/first/finish")
 	@ApiOperation(value = "Return a flatmate entity with first step completed", response = Flatmate.class)
-	public Flatmate finishStepFirst(@ApiIgnore @UserLogged Flatmate flatmate) {
-		return userService.finishStepFirst(flatmate.getId());
+	public Flatmate finishStepFirst() {
+		return userService.finishStepFirst();
 	}
 
 }

@@ -21,11 +21,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private FlatmateRepository flatmateRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
+		
 		Flatmate userInfo = flatmateRepository.findByEmailAndEnabled(username, true);
 		
+		if (userInfo == null) {
+            throw new UsernameNotFoundException(String.format("User '%s' not found", username));	
+		}
+		
 		String[] roles = userInfo.getRoles().split(",");
-		Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 		for (int i = 0; i < roles.length; i++) {
 			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_"+roles[i]));
 		}

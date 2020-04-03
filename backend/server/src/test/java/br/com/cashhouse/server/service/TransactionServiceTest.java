@@ -32,6 +32,7 @@ import br.com.cashhouse.core.repository.TransactionRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.exception.InvalidOperationException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import br.com.cashhouse.server.util.security.LoginWithAdmin;
 
 @RunWith(SpringRunner.class)
@@ -55,6 +56,9 @@ public class TransactionServiceTest {
 
 	@MockBean
 	private AuthenticationFacade authenticationFacade;
+	
+	@MockBean
+	private HeaderRequest headerRequest;
 
 	@TestConfiguration
 	static class TransactionServiceImplTestContextConfiguration {
@@ -76,10 +80,11 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		
-		Transaction transactionFound = transactionService.findById(dashboard, 1L);
+		Transaction transactionFound = transactionService.findById(1L);
 		
 		assert(transactionFound.getId()).equals(1l);
 		assert(transactionFound.getValue()).equals(BigDecimal.valueOf(2.33));
@@ -96,10 +101,11 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
-		
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
 		
-		transactionService.findById(dashboard, 1L);
+		transactionService.findById(1L);
 		
 	}
 	
@@ -129,11 +135,12 @@ public class TransactionServiceTest {
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(new Transaction());
 		
-        transactionService.createDeposit(dashboard, energy, BigDecimal.valueOf(2.33));
+        transactionService.createDeposit(energy, BigDecimal.valueOf(2.33));
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -157,11 +164,12 @@ public class TransactionServiceTest {
 		Flatmate flatmateAssign = createFlatmate(2l, "Assign", "Assign");
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(new Transaction());
 		
-        transactionService.createDeposit(dashboard, energy, flatmateAssign, BigDecimal.valueOf(2.33));
+        transactionService.createDeposit(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -186,9 +194,10 @@ public class TransactionServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 
-        transactionService.createDeposit(dashboard, energy, flatmateAssign, BigDecimal.valueOf(2.33));
+        transactionService.createDeposit(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 		
 	}
 	
@@ -199,11 +208,12 @@ public class TransactionServiceTest {
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(new Transaction());
 		
-        transactionService.createwithdraw(dashboard, energy, BigDecimal.valueOf(2.33));
+        transactionService.createwithdraw(energy, BigDecimal.valueOf(2.33));
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -227,11 +237,12 @@ public class TransactionServiceTest {
 		Flatmate flatmateAssign = createFlatmate(2l, "Assign", "Assign");
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(new Transaction());
 		
-        transactionService.createwithdraw(dashboard, energy, flatmateAssign, BigDecimal.valueOf(2.33));
+        transactionService.createwithdraw(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -256,9 +267,10 @@ public class TransactionServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 
-        transactionService.createwithdraw(dashboard, energy, flatmateAssign, BigDecimal.valueOf(2.33));
+        transactionService.createwithdraw(energy, flatmateAssign, BigDecimal.valueOf(2.33));
 		
 	}
 	
@@ -275,13 +287,14 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.of(transaction));
-		when(cashierService.findById(eq(dashboard), anyLong())).thenReturn(energy);
+		when(cashierService.findById(anyLong())).thenReturn(energy);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 
-        transactionService.update(dashboard, 1l, transaction);
+        transactionService.update(1l, transaction);
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -312,14 +325,15 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmateAssign);
 		transaction.setAssigned(flatmateAssign);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.of(transaction));
-		when(cashierService.findById(eq(dashboard), anyLong())).thenReturn(energy);
+		when(cashierService.findById(anyLong())).thenReturn(energy);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
-		when(flatmateService.findById(any(Dashboard.class), anyLong())).thenReturn(Optional.of(flatmateAssign));
+		when(flatmateService.findById(anyLong())).thenReturn(Optional.of(flatmateAssign));
 
-        transactionService.update(dashboard, 1l, transaction);
+        transactionService.update(1l, transaction);
 
 		assertEquals(dashboard.getTransactions().size(), 1);
 		
@@ -344,9 +358,10 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmateAssign = createFlatmate(2l, "Assign", "Assign");
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 
-        transactionService.update(dashboard, 1l, new Transaction());
+        transactionService.update(1l, new Transaction());
 		
 	}
 
@@ -366,11 +381,12 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmateAssign);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
-		when(flatmateService.findById(any(Dashboard.class), anyLong())).thenReturn(Optional.empty());
+		when(flatmateService.findById(anyLong())).thenReturn(Optional.empty());
 
-        transactionService.update(dashboard, 1l, new Transaction());
+        transactionService.update(1l, new Transaction());
 		
 	}
 
@@ -390,11 +406,12 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
-		when(flatmateService.findById(any(Dashboard.class), anyLong())).thenReturn(Optional.empty());
+		when(flatmateService.findById(anyLong())).thenReturn(Optional.empty());
 
-        transactionService.update(dashboard, 1l, new Transaction());
+        transactionService.update(1l, new Transaction());
 		
 	}
 
@@ -405,10 +422,11 @@ public class TransactionServiceTest {
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 
-        transactionService.update(dashboard, 1l, new Transaction());
+        transactionService.update(1l, new Transaction());
 		
 	}
 
@@ -424,11 +442,12 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.updateValue(dashboard, 1L, BigDecimal.valueOf(5.71));
+		transactionService.updateValue(1L, BigDecimal.valueOf(5.71));
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getValue()).equals(BigDecimal.valueOf(5.71));
@@ -440,10 +459,11 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
 		
-		transactionService.updateValue(dashboard, 1L, BigDecimal.valueOf(5.71));
+		transactionService.updateValue(1L, BigDecimal.valueOf(5.71));
 		
 	}
 
@@ -459,10 +479,11 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		
-		transactionService.updateValue(dashboard, 1L, BigDecimal.valueOf(5.71));
+		transactionService.updateValue(1L, BigDecimal.valueOf(5.71));
 		
 	}
 
@@ -478,11 +499,12 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.updateCashier(dashboard, 1L, energy);
+		transactionService.updateCashier(1L, energy);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getCashier()).equals(energy);
@@ -494,10 +516,11 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
 		
-		transactionService.updateCashier(dashboard, 1L, new Cashier());
+		transactionService.updateCashier(1L, new Cashier());
 		
 	}
 
@@ -513,10 +536,11 @@ public class TransactionServiceTest {
 		transaction.setCreateBy(flatmate);
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		
-		transactionService.updateCashier(dashboard, 1L, energy);
+		transactionService.updateCashier(1L, energy);
 		
 	}
 
@@ -535,11 +559,12 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.updateFlatmateAssigned(dashboard, 1L, flatmateAssign);
+		transactionService.updateFlatmateAssigned(1L, flatmateAssign);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getAssigned()).equals(flatmateAssign);
@@ -554,9 +579,10 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmateAssign = createFlatmate(2l, "Assign", "Assign");
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 		
-		transactionService.updateFlatmateAssigned(dashboard, 1L, new Flatmate());
+		transactionService.updateFlatmateAssigned(1L, new Flatmate());
 		
 	}
 
@@ -566,10 +592,11 @@ public class TransactionServiceTest {
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(any(Dashboard.class), eq(1l))).thenReturn(Optional.empty());
 		
-		transactionService.updateFlatmateAssigned(dashboard, 1L, new Flatmate());
+		transactionService.updateFlatmateAssigned(1L, new Flatmate());
 		
 	}
 
@@ -586,10 +613,11 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		
-		transactionService.updateFlatmateAssigned(dashboard, 1L, flatmate);
+		transactionService.updateFlatmateAssigned(1L, flatmate);
 		
 	}
 
@@ -606,10 +634,11 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.send(dashboard, transaction);
+		transactionService.send(transaction);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getStatus()).equals(Status.SENDED);
@@ -629,9 +658,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		
-		transactionService.send(dashboard, transaction);
+		transactionService.send(transaction);
 		
 	}
 
@@ -650,9 +680,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmateAssign);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		
-		transactionService.send(dashboard, transaction);
+		transactionService.send(transaction);
 		
 	}
 
@@ -669,11 +700,12 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		doNothing().when(cashierService).applyTransaction(transaction);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.finish(dashboard, transaction);
+		transactionService.finish(transaction);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getStatus()).equals(Status.FINISHED);
@@ -695,9 +727,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 		
-		transactionService.finish(dashboard, transaction);
+		transactionService.finish(transaction);
 		
 	}
 
@@ -714,9 +747,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		
-		transactionService.finish(dashboard, transaction);
+		transactionService.finish(transaction);
 		
 	}
 
@@ -733,10 +767,11 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.cancel(dashboard, transaction);
+		transactionService.cancel(transaction);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getStatus()).equals(Status.CANCELED);
@@ -758,9 +793,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 		
-		transactionService.cancel(dashboard, transaction);
+		transactionService.cancel(transaction);
 		
 	}
 
@@ -777,9 +813,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		
-		transactionService.cancel(dashboard, transaction);
+		transactionService.cancel(transaction);
 		
 	}
 	
@@ -796,10 +833,11 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 		
-		transactionService.delete(dashboard, transaction);
+		transactionService.delete(transaction);
 		
 		assert(transaction.getId()).equals(1l);
 		assert(transaction.getStatus()).equals(Status.DELETED);
@@ -819,9 +857,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		
-		transactionService.delete(dashboard, transaction);
+		transactionService.delete(transaction);
 		
 	}
 
@@ -840,9 +879,10 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 		
-		transactionService.delete(dashboard, transaction);
+		transactionService.delete(transaction);
 		
 	}
 	
@@ -885,11 +925,12 @@ public class TransactionServiceTest {
 		transaction.setAssigned(flatmate);
 		transaction.setCashier(energy);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(transaction));
 		doNothing().when(dashboardService).removeTransaction(dashboard, transaction);
 		
-		transactionService.delete(dashboard, 1l);
+		transactionService.delete(1l);
 		
 	}
 
@@ -901,9 +942,10 @@ public class TransactionServiceTest {
 		
 		Flatmate flatmateAssign = createFlatmate(2l, "Assign", "Assign");
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmateAssign);
 		
-		transactionService.delete(dashboard, 1l);
+		transactionService.delete(1l);
 		
 	}
 
@@ -913,10 +955,11 @@ public class TransactionServiceTest {
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(transactionRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
-		transactionService.delete(dashboard, 1l);
+		transactionService.delete(1l);
 		
 	}
 	

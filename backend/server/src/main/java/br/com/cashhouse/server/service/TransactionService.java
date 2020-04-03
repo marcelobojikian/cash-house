@@ -19,41 +19,41 @@ public interface TransactionService {
 	
 	public List<Transaction> findAll(Dashboard dashboard);
 	
-	public Page<Transaction> findAll(Dashboard dashboard, Predicate parameters, Pageable pageable);
+	public Page<Transaction> findAll(Predicate parameters, Pageable pageable);
 
-	public Transaction findById(Dashboard dashboard, Long id);
+	public Transaction findById(Long id);
 	
 	public Collection<Transaction> findByCashierReferences(Dashboard dashboard, Cashier cashier);
 	
 	public Collection<Transaction> findByFlatmateReferences(Dashboard dashboard, Flatmate createBy, Flatmate assigned);
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public Transaction update(Dashboard dashboard, Long id, Transaction newTransaction);
+	public Transaction update(Long id, Transaction newTransaction);
 
-	public void updateFlatmateAssigned(Dashboard dashboard, Long id, Flatmate flatmateAssigned);
+	public void updateFlatmateAssigned(Long id, Flatmate flatmateAssigned);
 
-	public void updateCashier(Dashboard dashboard, Long id, Cashier cashier);
+	public void updateCashier(Long id, Cashier cashier);
 
-	public void updateValue(Dashboard dashboard, Long id, BigDecimal value);
+	public void updateValue(Long id, BigDecimal value);
 	
-	public void delete(Dashboard dashboard, Long id);
+	public void delete(Long id);
 	
 	/* Actions */
 
-	public Transaction createDeposit(Dashboard dashboard, Cashier cashier, BigDecimal value);
+	public Transaction createDeposit(Cashier cashier, BigDecimal value);
 
-	public Transaction createDeposit(Dashboard dashboard, Cashier cashier, Flatmate flatmateAssign, BigDecimal value);
+	public Transaction createDeposit(Cashier cashier, Flatmate flatmateAssign, BigDecimal value);
 
-	public Transaction createwithdraw(Dashboard dashboard, Cashier cashier, BigDecimal value);
+	public Transaction createwithdraw(Cashier cashier, BigDecimal value);
 
-	public Transaction createwithdraw(Dashboard dashboard, Cashier cashier, Flatmate flatmateAssign, BigDecimal value);
+	public Transaction createwithdraw(Cashier cashier, Flatmate flatmateAssign, BigDecimal value);
 	
-	public Transaction send(Dashboard dashboard, Transaction transaction);
+	public Transaction send(Transaction transaction);
 	
-	public Transaction finish(Dashboard dashboard, Transaction transaction);
+	public Transaction finish(Transaction transaction);
 	
-	public Transaction cancel(Dashboard dashboard, Transaction transaction);
+	public Transaction cancel(Transaction transaction);
 	
-	public Transaction delete(Dashboard dashboard, Transaction transaction);
+	public Transaction delete(Transaction transaction);
 
 }

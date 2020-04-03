@@ -4,6 +4,8 @@ The server can be easily run on any operating system such as Linux or Windows, f
 ## Dependencies
     1. Download and Install [Java](https://www.oracle.com/java/) 1.8 or above ( recommended )
     2. Download and Install [Maven](https://maven.apache.org/) 3.6+ ( recommended )
+    3. Download and Install [Docker](https://www.docker.com/) 19.03.6 ( recommended )
+    4. Download and Install [Docker Compose](https://docs.docker.com/compose/) 1.25.0 ( recommended )
     
 ## How to Install
     1. git clone https://github.com/marcelobojikian/cash-house.git

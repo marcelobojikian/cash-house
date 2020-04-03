@@ -1,6 +1,6 @@
 package br.com.cashhouse.server.service;
 
-import static br.com.cashhouse.server.util.EntityFactory.*;
+import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,6 +29,8 @@ import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.repository.FlatmateRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
+import br.com.cashhouse.server.util.LoginWith;
 import br.com.cashhouse.server.util.security.LoginWithAdmin;
 
 @RunWith(SpringRunner.class)
@@ -60,6 +62,9 @@ public class FlatmateServiceTest {
 
 	@MockBean
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@MockBean
+	private HeaderRequest headerRequest;
 
 	@Test
 	public void whenFindByEmail_thenReturnObject() throws Exception {
@@ -92,10 +97,11 @@ public class FlatmateServiceTest {
 
         Dashboard dashboard = admin.getDashboard();
         dashboard.setGuests(Arrays.asList(joao));
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(flatmateRepository.findByDashboardAndId(dashboard, 2L)).thenReturn(Optional.of(joao));
 		
-		Flatmate flatmate = flatmateService.findById(dashboard, 2L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 2L));
+		Flatmate flatmate = flatmateService.findById(2L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 2L));
 		
 		assert(flatmate.getEmail()).equals("joao@mail.com");
 		assert(flatmate.getNickname()).equals("Joao A. M.");
@@ -108,8 +114,9 @@ public class FlatmateServiceTest {
 		Flatmate admin = createFlatmate(1l, "admin@mail.com", "Administrator");
 
         Dashboard dashboard = admin.getDashboard();
-		
-		Flatmate flatmate = flatmateService.findById(dashboard, 1L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 1L));
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
+		Flatmate flatmate = flatmateService.findById(1L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 1L));
 		
 		assert(flatmate.getEmail()).equals("admin@mail.com");
 		assert(flatmate.getNickname()).equals("Administrator");
@@ -122,10 +129,11 @@ public class FlatmateServiceTest {
 		Flatmate admin = createFlatmate(1l, "admin@mail.com", "Administrator");
 
         Dashboard dashboard = admin.getDashboard();
-		
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(flatmateRepository.findById(3L)).thenReturn(Optional.empty());
 		
-		flatmateService.findById(dashboard, 3L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 3L));
+		flatmateService.findById(3L).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, 3L));
 		
 	}
 
@@ -135,8 +143,10 @@ public class FlatmateServiceTest {
 		Flatmate admin = createFlatmate(1l, "admin@mail.com", "Administrator");
 
         Dashboard dashboard = admin.getDashboard();
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		
-		List<Flatmate> flatmates = flatmateService.findAll(dashboard);
+		List<Flatmate> flatmates = flatmateService.findAll();
 		
 		assert(flatmates).isEmpty();
 		
@@ -150,8 +160,10 @@ public class FlatmateServiceTest {
 
         Dashboard dashboard = admin.getDashboard();
         dashboard.setGuests(Arrays.asList(joao));
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		
-        List<Flatmate> flatmates = flatmateService.findAll(dashboard);
+        List<Flatmate> flatmates = flatmateService.findAll();
 		
 		assert(flatmates).contains(joao);
 		
@@ -165,11 +177,12 @@ public class FlatmateServiceTest {
 
         Dashboard dashboard = admin.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(admin);
 		when(bCryptPasswordEncoder.encode(anyString())).thenReturn("password");
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(newFlatmate);
         
-        Flatmate flatmate = flatmateService.create(dashboard, "new@mail.com", "new", "password");
+        Flatmate flatmate = flatmateService.create("new@mail.com", "new", "password");
 
 		assert(flatmate.getEmail()).equals("new@mail.com");
 		assert(flatmate.getNickname()).equals("new");
@@ -186,9 +199,10 @@ public class FlatmateServiceTest {
         Dashboard dashboard = admin.getDashboard();
         dashboard.setGuests(Arrays.asList(joao));
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
-        flatmateService.create(dashboard, "mail@mail.com", "invalid", "invalid");
+        flatmateService.create("mail@mail.com", "invalid", "invalid");
 		
 	}
 
@@ -223,6 +237,7 @@ public class FlatmateServiceTest {
 		
 	}
 
+	@LoginWith(id = 2l)
 	@Test
 	public void whenUpdateNickname_thenReturnObject() throws Exception {
 
@@ -230,7 +245,6 @@ public class FlatmateServiceTest {
 		Flatmate update = createFlatmate(2l, "joao@mail.com", "update", "password");
 
 		when(flatmateRepository.findById(2L)).thenReturn(Optional.of(joao));
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(update);
         
         Flatmate flatmate = flatmateService.update(2L, "update");
@@ -241,29 +255,25 @@ public class FlatmateServiceTest {
 		
 	}
 
-	@Test(expected = AccessDeniedException.class)
+	@LoginWith(id = 2l)
+	@Test(expected = org.springframework.security.access.AccessDeniedException.class)
 	public void whenUpdateNickname_thenThrowAccessDeniedException() throws Exception {
-
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-		
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.update(3L, "update");
 		
 	}
 
+	@LoginWith(id = 2l)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenUpdateNickname_thenThrowEntityNotFoundException() throws Exception {
 
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-
 		when(flatmateRepository.findById(2L)).thenReturn(Optional.empty());
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.update(2L, "update");
 		
 	}
-	
+
+	@LoginWith(id = 2l)
 	@Test
 	public void whenUpdateNicknamePassword_thenReturnObject() throws Exception {
 
@@ -272,7 +282,6 @@ public class FlatmateServiceTest {
 
 		when(flatmateRepository.findById(2L)).thenReturn(Optional.of(joao));
 		when(bCryptPasswordEncoder.encode(anyString())).thenReturn("new-password");
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
 		when(flatmateRepository.save(any(Flatmate.class))).thenReturn(update);
         
         Flatmate flatmate = flatmateService.update(2L, "update", "new-password");
@@ -283,24 +292,19 @@ public class FlatmateServiceTest {
 		
 	}
 
-	@Test(expected = AccessDeniedException.class)
+	@LoginWith(id = 2l)
+	@Test(expected = org.springframework.security.access.AccessDeniedException.class)
 	public void whenUpdateNicknamePassword_thenThrowAccessDeniedException() throws Exception {
-
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-		
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.update(3L, "update", "new-password");
 		
 	}
 
+	@LoginWith(id = 2l)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenUpdateNicknamePassword_thenThrowEntityNotFoundException() throws Exception {
 
-		Flatmate joao = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
-
 		when(flatmateRepository.findById(2L)).thenReturn(Optional.empty());
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(joao);
         
         flatmateService.update(2L, "update", "new-password");
 		
@@ -312,13 +316,14 @@ public class FlatmateServiceTest {
 		Flatmate flatmate = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(flatmateRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(flatmate));
 		when(transactionService.findByFlatmateReferences(eq(dashboard), any(Flatmate.class), any(Flatmate.class))).thenReturn(new ArrayList<Transaction>());
 		doNothing().when(dashboardService).removeGuest(eq(dashboard), any(Flatmate.class));
 		doNothing().when(dashboardService).removeTransactions(eq(dashboard), anyCollection());
 		
-		flatmateService.delete(dashboard, 1l);
+		flatmateService.delete(1l);
 		
 	}
 
@@ -328,10 +333,11 @@ public class FlatmateServiceTest {
 		Flatmate flatmate = createFlatmate(2l, "joao@mail.com", "Joao A. M.", "password");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(flatmateRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
-		flatmateService.delete(dashboard, 1l);
+		flatmateService.delete(1l);
 		
 	}
 
@@ -343,9 +349,10 @@ public class FlatmateServiceTest {
 
 		Flatmate notDashboarOwner = createFlatmate(3l, "not owner", "not owner");
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		
-		flatmateService.delete(dashboard, 1l);
+		flatmateService.delete(1l);
 		
 	}
 
