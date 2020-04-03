@@ -15,9 +15,13 @@ import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.repository.FlatmateRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 
 @Service
 public class FlatmateServiceImpl implements FlatmateService {
+
+	@Autowired
+	private HeaderRequest headerRequest;
 
 	@Autowired
 	private AuthenticationFacade authenticationFacade;
@@ -41,7 +45,9 @@ public class FlatmateServiceImpl implements FlatmateService {
 	}
 
 	@Override
-	public Optional<Flatmate> findById(Dashboard dashboard, long id) {
+	public Optional<Flatmate> findById(long id) {
+
+		Dashboard dashboard = headerRequest.getDashboard();
 
 		if (dashboard.getOwner().getId().equals(id)) {
 			return Optional.of(dashboard.getOwner());
@@ -52,12 +58,15 @@ public class FlatmateServiceImpl implements FlatmateService {
 	}
 
 	@Override
-	public List<Flatmate> findAll(Dashboard dashboard) {
+	public List<Flatmate> findAll() {
+		Dashboard dashboard = headerRequest.getDashboard();
 		return dashboard.getGuests();
 	}
 
 	@Override
-	public Flatmate create(Dashboard dashboard, String email, String nickname, String password) {
+	public Flatmate create(String email, String nickname, String password) {
+
+		Dashboard dashboard = headerRequest.getDashboard();
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
@@ -98,12 +107,6 @@ public class FlatmateServiceImpl implements FlatmateService {
 	@Override
 	public Flatmate update(long id, String nickname) {
 
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!flatmateLogged.getId().equals(id)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
-
 		Flatmate entity = flatmateRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException(Flatmate.class, id));
 
@@ -115,12 +118,6 @@ public class FlatmateServiceImpl implements FlatmateService {
 
 	@Override
 	public Flatmate update(long id, String nickname, String password) {
-
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!flatmateLogged.getId().equals(id)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		String cryptPassword = bCryptPasswordEncoder.encode(password);
 
@@ -136,7 +133,9 @@ public class FlatmateServiceImpl implements FlatmateService {
 
 	@Override
 	@Transactional
-	public void delete(Dashboard dashboard, long id) {
+	public void delete(long id) {
+
+		Dashboard dashboard = headerRequest.getDashboard();
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 

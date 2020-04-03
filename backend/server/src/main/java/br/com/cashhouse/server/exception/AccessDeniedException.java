@@ -8,12 +8,13 @@ public class AccessDeniedException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Flatmate flatmate;
-	private String field;
+	private final Flatmate flatmate;
+	private final String field;
 
 	public AccessDeniedException(Flatmate flatmate) {
         super(String.format("Flatmate %s does not have permissions for the resource", flatmate.getId()));
         this.flatmate = flatmate;
+        this.field = null;
     }
 
 	public AccessDeniedException(Flatmate flatmate, String field) {

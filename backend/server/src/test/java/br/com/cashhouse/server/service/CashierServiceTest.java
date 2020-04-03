@@ -30,6 +30,7 @@ import br.com.cashhouse.core.model.Transaction.Action;
 import br.com.cashhouse.core.repository.CashierRepository;
 import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
+import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import br.com.cashhouse.server.util.security.LoginWithAdmin;
 
 @RunWith(SpringRunner.class)
@@ -50,6 +51,9 @@ public class CashierServiceTest {
 
 	@MockBean
 	private AuthenticationFacade authenticationFacade;
+	
+	@MockBean
+	private HeaderRequest headerRequest;
 
 	@TestConfiguration
 	static class CashierServiceImplTestContextConfiguration {
@@ -66,10 +70,11 @@ public class CashierServiceTest {
 		Dashboard dashboard = flatmate.getDashboard();
 		
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-        
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		
-		Cashier CashierExpect = cashierService.findById(dashboard, 1L);
+		Cashier CashierExpect = cashierService.findById(1L);
 		
 		assert(CashierExpect.getId()).equals(1l);
 		assert(CashierExpect.getName()).equals("Energy");
@@ -83,10 +88,11 @@ public class CashierServiceTest {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
-		
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
-		cashierService.findById(dashboard, 1L);
+		cashierService.findById(1L);
 		
 	}
 	
@@ -98,8 +104,9 @@ public class CashierServiceTest {
 		
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 		Cashier garbage = createCashier(dashboard, 2l, "Garbage", 4.2, 56.6);
-		
-        List<Cashier> cashiers = cashierService.findAll(dashboard);
+
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
+        List<Cashier> cashiers = cashierService.findAll();
 		
 		assert(cashiers).contains(energy);
 		assert(cashiers).contains(garbage);
@@ -114,10 +121,11 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		Cashier cashier = cashierService.create(dashboard, "Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
+		Cashier cashier = cashierService.create("Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
 		
 		assert(cashier.getId()).equals(1l);
 		assert(cashier.getName()).equals("Energy");
@@ -136,10 +144,11 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		cashierService.create(dashboard, "Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
+		cashierService.create("Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
 		
 	}
 	
@@ -152,11 +161,12 @@ public class CashierServiceTest {
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 		Cashier energyNew = createCashier(dashboard, 1l, "Energy UP", 3.1, 3.2);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		when(cashierRepository.save(energy)).thenReturn(energy);
 		
-		Cashier cashier = cashierService.update(dashboard, 1l, energyNew);
+		Cashier cashier = cashierService.update(1l, energyNew);
 		
 		assert(cashier.getId()).equals(1l);
 		assert(cashier.getName()).equals("Energy UP");
@@ -173,11 +183,12 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 99l)).thenReturn(Optional.empty());
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		cashierService.update(dashboard, 99l, energy);
+		cashierService.update(99l, energy);
 		
 	}
 
@@ -191,10 +202,11 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		cashierService.update(dashboard, 1l, energy);
+		cashierService.update(1l, energy);
 		
 	}
 	
@@ -206,11 +218,12 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		when(cashierRepository.save(energy)).thenReturn(energy);
 		
-		Cashier cashier = cashierService.update(dashboard, 1l, "Energy UP");
+		Cashier cashier = cashierService.update(1l, "Energy UP");
 		
 		assert(cashier.getId()).equals(1l);
 		assert(cashier.getName()).equals("Energy UP");
@@ -225,13 +238,11 @@ public class CashierServiceTest {
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
 
-		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 99l)).thenReturn(Optional.empty());
-		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		cashierService.update(dashboard, 99l, "Energy UP");
+		cashierService.update(99l, "Energy UP");
 		
 	}
 
@@ -245,10 +256,11 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
-		cashierService.update(dashboard, 1l, "Energy UP");
+		cashierService.update(1l, "Energy UP");
 		
 	}
 	
@@ -261,13 +273,14 @@ public class CashierServiceTest {
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		when(transactionService.findByCashierReferences(eq(dashboard), any(Cashier.class))).thenReturn(new ArrayList<Transaction>());
 		doNothing().when(dashboardService).removeCashier(eq(dashboard), any(Cashier.class));
 		doNothing().when(dashboardService).removeTransactions(eq(dashboard), anyCollection());
 		
-		cashierService.delete(dashboard, 1l);
+		cashierService.delete(1l);
 		
 	}
 
@@ -278,10 +291,11 @@ public class CashierServiceTest {
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
 		Dashboard dashboard = flatmate.getDashboard();
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
-		cashierService.delete(dashboard, 1l);
+		cashierService.delete(1l);
 		
 	}
 
@@ -294,9 +308,10 @@ public class CashierServiceTest {
 
 		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
 
+		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		
-		cashierService.delete(dashboard, 1l);
+		cashierService.delete(1l);
 		
 	}
 	

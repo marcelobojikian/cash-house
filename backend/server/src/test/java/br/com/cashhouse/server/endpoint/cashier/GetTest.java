@@ -1,9 +1,11 @@
 package br.com.cashhouse.server.endpoint.cashier;
 
-import static br.com.cashhouse.server.util.security.SecurityAccess.User.*;
+import static br.com.cashhouse.server.util.security.SecurityAccess.User.BIRO;
+import static br.com.cashhouse.server.util.security.SecurityAccess.User.GRETCHEN;
+import static br.com.cashhouse.server.util.security.SecurityAccess.User.JEAN;
+import static br.com.cashhouse.server.util.security.SecurityAccess.User.MARCELO;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,9 +90,7 @@ public class GetTest extends Oauth2 {
 
 		// @formatter:off
 		get("/cashiers")
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", empty()));
+				.andExpect(status().isNoContent());
         // @formatter:on
 
 	}

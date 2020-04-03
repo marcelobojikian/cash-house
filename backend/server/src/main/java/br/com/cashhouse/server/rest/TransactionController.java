@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.querydsl.core.types.Predicate;
 
 import br.com.cashhouse.core.model.Cashier;
-import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
@@ -65,18 +64,17 @@ public class TransactionController {
 	@GetMapping("")
 	@ApiOperation(value = "Return a list with all transactions", response = Transaction[].class)
 	public ResponseEntity<?> findAll(
-			@ApiIgnore Dashboard dashboard,
 			@ApiIgnore @QuerydslPredicate(root = Transaction.class) Predicate predicate, 
 			@ApiIgnore Pageable pageable,
 			@RequestParam(required = false, defaultValue = "none") String group) {
 		
-		Page<Transaction> result = transactionService.findAll(dashboard, predicate, pageable);
+		Page<Transaction> result = transactionService.findAll(predicate, pageable);
     	
         long totalElements = result.getTotalElements();
         int numberOfElements = result.getNumberOfElements();
         
         if (result.getContent().isEmpty()) {
-	        return new ResponseEntity<Page<Content<Transaction>>>(HttpStatus.NO_CONTENT);
+	        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	    }
         
         HttpStatus httpStatus = numberOfElements < totalElements ? HttpStatus.PARTIAL_CONTENT : HttpStatus.OK;
@@ -84,39 +82,38 @@ public class TransactionController {
 		if(group.equals("createdDate")) {
 		        
 			List<Content<Transaction>> list = groupByCreatedDate(result);
-			Page<Content<Transaction>> pageFormated = new PageImpl<Content<Transaction>>(list, pageable, Long.valueOf(list.size()));
+			Page<Content<Transaction>> pageFormated = new PageImpl<>(list, pageable, Long.valueOf(list.size()));
 
-            return new ResponseEntity<Page<Content<Transaction>>>(pageFormated, httpStatus);
+            return new ResponseEntity<>(pageFormated, httpStatus);
 			
 		}else {
-			return new ResponseEntity<Page<Transaction>>(result, httpStatus);
+			return new ResponseEntity<>(result, httpStatus);
 		}
 		
 	}
 
 	@GetMapping("/{id}")
 	@ApiOperation(value = "Return a transaction entity by id", response = Transaction.class)
-	public Transaction findOne(@ApiIgnore Dashboard dashboard, @PathVariable Long id) {
-		return transactionService.findById(dashboard, id);
+	public Transaction findOne(@PathVariable Long id) {
+		return transactionService.findById(id);
 	}
 
 	@PostMapping("/deposit")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Returns a created deposit transaction entity", response = Transaction.class)
 	public Transaction createDepoist(
-			@ApiIgnore Dashboard dashboard,
 			@RequestBody @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
 		Long cashierId = content.getCashier();
-		Cashier cashier = cashierService.findById(dashboard, cashierId);
+		Cashier cashier = cashierService.findById(cashierId);
 
 		Long flatmateId = content.getAssigned();
 		if (StringUtils.isEmpty(flatmateId)) {
-			return transactionService.createDeposit(dashboard, cashier, value);
+			return transactionService.createDeposit(cashier, value);
 		} else {
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
-			return transactionService.createDeposit(dashboard, cashier, flatmateAssigned, value);
+			Flatmate flatmateAssigned = flatmateService.findById(flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
+			return transactionService.createDeposit(cashier, flatmateAssigned, value);
 		}
 		
 	}
@@ -125,19 +122,18 @@ public class TransactionController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Returns a created withdraw transaction entity", response = Transaction.class)
 	public Transaction createWithdraw(
-			@ApiIgnore Dashboard dashboard, 
 			@RequestBody @Valid CreateTransaction content) {
 		
 		BigDecimal value = content.getValue();
 		Long cashierId = content.getCashier();
-		Cashier cashier = cashierService.findById(dashboard, cashierId);
+		Cashier cashier = cashierService.findById(cashierId);
 
 		Long flatmateId = content.getAssigned();
 		if (StringUtils.isEmpty(flatmateId)) {
-			return transactionService.createwithdraw(dashboard, cashier, value);
+			return transactionService.createwithdraw(cashier, value);
 		} else {
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
-			return transactionService.createwithdraw(dashboard, cashier, flatmateAssigned, value);
+			Flatmate flatmateAssigned = flatmateService.findById(flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
+			return transactionService.createwithdraw(cashier, flatmateAssigned, value);
 		}
 		
 	}
@@ -145,16 +141,14 @@ public class TransactionController {
 	@PutMapping("/{id}")
 	@ApiOperation(value = "Return a transaction entity updated", response = Transaction.class)
 	public Transaction update(
-			@ApiIgnore Dashboard dashboard,
 			@PathVariable Long id, 
 			@RequestBody Transaction transaction) {
-		return transactionService.update(dashboard, id, transaction);
+		return transactionService.update(id, transaction);
 	}
 
 	@PatchMapping("/{id}")
 	@ApiOperation(value = "Return a transaction entity partial updated", response = Transaction.class)
 	public Transaction patch(
-			@ApiIgnore Dashboard dashboard,
 			@PathVariable @NotNull Long id,
 			@RequestBody @Valid UpdateTransaction content) {
 		
@@ -164,21 +158,21 @@ public class TransactionController {
 		
 		if(content.haveFlatmateAssigned()) {
 			Long flatmateId = content.getAssigned();
-			Flatmate flatmateAssigned = flatmateService.findById(dashboard, flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
-			transactionService.updateFlatmateAssigned(dashboard, id, flatmateAssigned);
+			Flatmate flatmateAssigned = flatmateService.findById(flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
+			transactionService.updateFlatmateAssigned(id, flatmateAssigned);
 		}
 		
 		if(content.changeCashier()) {
 			Long cashierId = content.getCashier();
-			Cashier cashier = cashierService.findById(dashboard, cashierId);
-			transactionService.updateCashier(dashboard, id, cashier);
+			Cashier cashier = cashierService.findById(cashierId);
+			transactionService.updateCashier(id, cashier);
 		}
 		
 		if(content.changeValue()) {
-			transactionService.updateValue(dashboard, id, content.getValue());
+			transactionService.updateValue(id, content.getValue());
 		}
 		
-		return transactionService.findById(dashboard, id);
+		return transactionService.findById(id);
 
 	}
 
@@ -186,9 +180,8 @@ public class TransactionController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Return status OK when deleted", response = Transaction.class)
 	public void detele(
-			@ApiIgnore Dashboard dashboard, 
 			@PathVariable Long id){
-		transactionService.delete(dashboard, id);
+		transactionService.delete(id);
 	}
 	
 	private List<Content<Transaction>> groupByCreatedDate(Page<Transaction> transaction) {
@@ -198,7 +191,7 @@ public class TransactionController {
 	}
 	
 	private <T> List<Content<T>> apply(Map<LocalDate, List<T>> data) {
-		List<Content<T>> list = new ArrayList<Content<T>>();
+		List<Content<T>> list = new ArrayList<>();
 		for (Map.Entry<LocalDate, List<T>> entry : data.entrySet()) {
 			list.add(new Content<T>(entry.getKey(), entry.getValue()));
 		}

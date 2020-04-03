@@ -26,13 +26,13 @@ public class UserServiceImpl implements UserService {
 	private FlatmateRepository flatmateRepository;
 
 	@Override
-	public Collection<Dashboard> findInvitations(long id) {
+	public Collection<Dashboard> findInvitations() {
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		return dashboardService.findMyInvitations(flatmateLogged);
 	}
 
 	@Override
-	public Flatmate changeNickname(long id, String nickname) {
+	public Flatmate changeNickname(String nickname) {
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		flatmateLogged.setNickname(nickname);
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Flatmate changePassword(long id, String password) {
+	public Flatmate changePassword(String password) {
 		String cryptPassword = bCryptPasswordEncoder.encode(password);
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Flatmate finishStepGuest(long id) {
+	public Flatmate finishStepGuest() {
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		flatmateLogged.setGuestStep(true);
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Flatmate finishStepFirst(long id) {
+	public Flatmate finishStepFirst() {
 
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 		flatmateLogged.setFirstStep(true);
