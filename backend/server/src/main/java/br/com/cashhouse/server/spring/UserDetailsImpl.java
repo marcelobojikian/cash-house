@@ -6,7 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import br.com.cashhouse.core.model.Flatmate;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 public class UserDetailsImpl extends User {
 
 	private static final long serialVersionUID = 1L;

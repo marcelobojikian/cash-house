@@ -26,97 +26,11 @@ import br.com.cashhouse.server.endpoint.Oauth2;
 public class PatchTest extends Oauth2 {
 
 	@Test
-	public void patch_All_parameter_OK() throws Exception {
-		
-		loginWith(MARCELO);
-
-		// @formatter:off
-		body()
-			.add("assigned", 3l)
-			.add("cashier", 1l)
-			.add("value", new BigDecimal("0.32"));
-		
-		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(4)))
-				.andExpect(jsonPath("$.createBy.id", is(5)))
-				.andExpect(jsonPath("$.assigned.id", is(3)))
-				.andExpect(jsonPath("$.cashier.id", is(1)))
-				.andExpect(jsonPath("$.status", is("CREATED")))
-				.andExpect(jsonPath("$.action", is("DEPOSIT")))
-				.andExpect(jsonPath("$.value",is(0.32)));
-        // @formatter:on
-
-	}
-
-	@Test
-	public void patch_assigned_OK() throws Exception {
-		
-		loginWith(MARCELO);
-
-		// @formatter:off
-		body().add("assigned", 3l);
-		
-		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(4)))
-				.andExpect(jsonPath("$.createBy.id", is(5)))
-				.andExpect(jsonPath("$.assigned.id", is(3)))
-				.andExpect(jsonPath("$.cashier.id", is(2)))
-				.andExpect(jsonPath("$.status", is("CREATED")))
-				.andExpect(jsonPath("$.action", is("DEPOSIT")))
-				.andExpect(jsonPath("$.value",is(12.03)));
-        // @formatter:on
-
-	}
-
-	@Test
-	public void patch_cashier_OK() throws Exception {
-		
-		loginWith(MARCELO);
-
-		// @formatter:off
-		body().add("cashier", 1l);
-		
-		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(4)))
-				.andExpect(jsonPath("$.createBy.id", is(5)))
-				.andExpect(jsonPath("$.assigned.id", is(5)))
-				.andExpect(jsonPath("$.cashier.id", is(1)))
-				.andExpect(jsonPath("$.status", is("CREATED")))
-				.andExpect(jsonPath("$.action", is("DEPOSIT")))
-				.andExpect(jsonPath("$.value",is(12.03)));
-        // @formatter:on
-
-	}
-
-	@Test
-	public void patch_value_OK() throws Exception {
-		
-		loginWith(MARCELO);
-
-		// @formatter:off
-		body().add("value", new BigDecimal("0.32"));
-		
-		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(4)))
-				.andExpect(jsonPath("$.createBy.id", is(5)))
-				.andExpect(jsonPath("$.assigned.id", is(5)))
-				.andExpect(jsonPath("$.cashier.id", is(2)))
-				.andExpect(jsonPath("$.status", is("CREATED")))
-				.andExpect(jsonPath("$.action", is("DEPOSIT")))
-				.andExpect(jsonPath("$.value",is(0.32)));
-        // @formatter:on
-
-	}
-
-	@Test
 	public void patch_NoContent_Fail() throws Exception {
 		
 		loginWith(MARCELO);
-		
+
+		// @formatter:off
 		patch("/transactions/4", "{}")
 				.andExpect(status().isNoContent());
         // @formatter:on
@@ -124,9 +38,9 @@ public class PatchTest extends Oauth2 {
 	}
 
 	@Test
-	public void patch_Forbidden_Not_Owner_Dashboard() throws Exception {
+	public void patch_Transaction_notFound() throws Exception {
 		
-		loginWith(BIRO).dashboard(MARCELO);
+		loginWith(MARCELO);
 
 		// @formatter:off
 		body()
@@ -134,8 +48,70 @@ public class PatchTest extends Oauth2 {
 			.add("cashier", 1l)
 			.add("value", new BigDecimal("0.32"));
 		
-		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isForbidden());
+		patch("/transactions/9")
+				.andExpect(status().isNotFound());
+        // @formatter:on
+
+	}
+
+	@Test
+	public void patch_All_parameter_userCreator_OK() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body()
+			.add("assigned", 3l)
+			.add("cashier", 1l)
+			.add("value", new BigDecimal("0.32"));
+		
+		patch("/transactions/11")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.createBy.id", is(1)))
+				.andExpect(jsonPath("$.assigned.id", is(3)))
+				.andExpect(jsonPath("$.cashier.id", is(1)))
+				.andExpect(jsonPath("$.status", is("CREATED")))
+				.andExpect(jsonPath("$.action", is("DEPOSIT")))
+				.andExpect(jsonPath("$.value",is(0.32)));
+        // @formatter:on
+
+	}
+
+	@Test
+	public void patch_All_parameter_userAssigned_OK() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body()
+			.add("assigned", 3l)
+			.add("cashier", 1l)
+			.add("value", new BigDecimal("0.32"));
+		
+		patch("/transactions/22")//.andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(22)))
+				.andExpect(jsonPath("$.createBy.id", is(5)))
+				.andExpect(jsonPath("$.assigned.id", is(3)))
+				.andExpect(jsonPath("$.cashier.id", is(1)))
+				.andExpect(jsonPath("$.status", is("CREATED")))
+				.andExpect(jsonPath("$.action", is("DEPOSIT")))
+				.andExpect(jsonPath("$.value",is(0.32)));
+        // @formatter:on
+
+	}
+	
+	@Test
+	public void patch_Transaction_unavailable_Status_MethodNotAllowed() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body().add("value", new BigDecimal("0.00"));
+		
+		patch("/transactions/2")
+				.andExpect(status().isMethodNotAllowed());
         // @formatter:on
 
 	}
@@ -201,45 +177,128 @@ public class PatchTest extends Oauth2 {
         // @formatter:on
 
 	}
-	
+
 	@Test
-	public void patch_Transaction_unavailable_Cashier_MethodNotAllowed() throws Exception {
+	public void patch_Forbidden_Not_Owner_Dashboard() throws Exception {
 		
-		loginWith(MARCELO);
+		loginWith(BIRO).dashboard(MARCELO);
 
 		// @formatter:off
-		body().add("cashier", 1l);
+		body()
+			.add("assigned", 3l)
+			.add("cashier", 1l)
+			.add("value", new BigDecimal("0.32"));
 		
-		patch("/transactions/2")
-				.andExpect(status().isMethodNotAllowed());
+		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isForbidden());
         // @formatter:on
 
 	}
 
 	@Test
-	public void patch_Transaction_unavailable_Assigner_MethodNotAllowed() throws Exception {
+	public void patch_Forbidden_Owner_Dashboard_but_notAssignedAndCreator_fail() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body()
+			.add("assigned", 3l)
+			.add("cashier", 1l)
+			.add("value", new BigDecimal("0.32"));
+		
+		patch("/transactions/4")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isForbidden());
+        // @formatter:on
+
+	}
+
+	@Test
+	public void patch_Only_assigned_OK() throws Exception {
 		
 		loginWith(MARCELO);
 
 		// @formatter:off
 		body().add("assigned", 3l);
 		
-		patch("/transactions/3")
-				.andExpect(status().isMethodNotAllowed());
+		patch("/transactions/1")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.createBy.id", is(1)))
+				.andExpect(jsonPath("$.assigned.id", is(3)))
+				.andExpect(jsonPath("$.cashier.id", is(1)))
+				.andExpect(jsonPath("$.status", is("CREATED")))
+				.andExpect(jsonPath("$.action", is("DEPOSIT")))
+				.andExpect(jsonPath("$.value",is(1.99)));
         // @formatter:on
 
 	}
 
 	@Test
-	public void patch_Transaction_unavailable_Value_MethodNotAllowed() throws Exception {
+	public void patch_Only_cashier_OK() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body().add("cashier", 2l);
+		
+		patch("/transactions/1")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.createBy.id", is(1)))
+				.andExpect(jsonPath("$.assigned.id", is(1)))
+				.andExpect(jsonPath("$.cashier.id", is(2)))
+				.andExpect(jsonPath("$.status", is("CREATED")))
+				.andExpect(jsonPath("$.action", is("DEPOSIT")))
+				.andExpect(jsonPath("$.value",is(1.99)));
+        // @formatter:on
+
+	}
+
+	@Test
+	public void patch_Only_value_OK() throws Exception {
 		
 		loginWith(MARCELO);
 
 		// @formatter:off
 		body().add("value", new BigDecimal("0.32"));
 		
-		patch("/transactions/5")
-				.andExpect(status().isMethodNotAllowed());
+		patch("/transactions/1")//.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.createBy.id", is(1)))
+				.andExpect(jsonPath("$.assigned.id", is(1)))
+				.andExpect(jsonPath("$.cashier.id", is(1)))
+				.andExpect(jsonPath("$.status", is("CREATED")))
+				.andExpect(jsonPath("$.action", is("DEPOSIT")))
+				.andExpect(jsonPath("$.value",is(0.32)));
+        // @formatter:on
+
+	}
+	
+	@Test
+	public void patch_Transaction_unavailable_Cashier_NotFound() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body().add("cashier", 3l);
+		
+		patch("/transactions/1")
+				.andExpect(status().isNotFound());
+        // @formatter:on
+
+	}
+
+	@Test
+	public void patch_Transaction_unavailable_Assigner_NotFound() throws Exception {
+		
+		loginWith(MARCELO);
+
+		// @formatter:off
+		body().add("assigned", 9l);
+		
+		patch("/transactions/1")
+				.andExpect(status().isNotFound());
         // @formatter:on
 
 	}

@@ -1,4 +1,6 @@
-package br.com.cashhouse.server.util;
+package br.com.cashhouse.server.util.security;
+
+import static br.com.cashhouse.server.util.EntityFactory.createFlatmate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,17 +16,21 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.server.spring.UserDetailsImpl;
+import br.com.cashhouse.server.util.annotation.LoginWith;
 
-public class LoginSecurityContextFactory implements WithSecurityContextFactory<LoginWith> {
+public class LoginWithContextFactory implements WithSecurityContextFactory<LoginWith> {
 	
 	@Override
 	public SecurityContext createSecurityContext(LoginWith withUser) {
 
-		Flatmate userInfo = new Flatmate();
-		userInfo.setId(withUser.id());
-		userInfo.setEmail(withUser.email());
-		userInfo.setNickname(withUser.nickname());
-		userInfo.setPassword(withUser.password());
+		// @formatter:off
+		Flatmate userInfo = 
+			createFlatmate(
+				withUser.id(), 
+				withUser.email(), 
+				withUser.nickname(),
+				withUser.password());
+		// @formatter:on
 		
 		String[] roles = withUser.roles();
 		Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
@@ -38,6 +44,7 @@ public class LoginSecurityContextFactory implements WithSecurityContextFactory<L
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		context.setAuthentication(authentication);
 		return context;
+		
 	}
 
 }

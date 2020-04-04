@@ -1,7 +1,7 @@
 package br.com.cashhouse.server.endpoint.transaction;
 
 import static br.com.cashhouse.server.util.security.SecurityAccess.User.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,8 +31,8 @@ public class GetTest extends Oauth2 {
 		// @formatter:off
 		get("/transactions")
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content", hasSize(5)))
-	        .andExpect(jsonPath("$.content[*].id", contains(1,2,3,5,6)));
+			.andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(5))))
+	        .andExpect(jsonPath("$.content[*].id", hasItems(1,2,3,5,6)));
         // @formatter:on
 
 	}

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.querydsl.core.types.Predicate;
@@ -17,13 +18,15 @@ import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.model.Transaction.Status;
 import br.com.cashhouse.core.repository.TransactionRepository;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.exception.InvalidOperationException;
+import br.com.cashhouse.server.rest.dto.UpdateTransaction;
 import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+	
+	private static final String LOCALE_KEY_ACCESS_DENIED = "flatmate.access.denied"; 
 
 	@Autowired
 	private HeaderRequest headerRequest;
@@ -43,6 +46,9 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	private TransactionRepository transactionRepository;
 
+	@Autowired
+	private LocaleService localeService;
+
 	@Override
 	public Transaction findById(Long id) {
 		Dashboard dashboard = headerRequest.getDashboard();
@@ -51,7 +57,8 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public List<Transaction> findAll(Dashboard dashboard) {
+	public List<Transaction> findAll() {
+		Dashboard dashboard = headerRequest.getDashboard();
 		return dashboard.getTransactions();
 	}
 
@@ -87,10 +94,6 @@ public class TransactionServiceImpl implements TransactionService {
 
 		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged, "assigned");
-		}
 
 		Transaction transaction = new Transaction();
 
@@ -132,10 +135,6 @@ public class TransactionServiceImpl implements TransactionService {
 		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged, "assigned");
-		}
-
 		Transaction transaction = new Transaction();
 
 		transaction.setAction(Transaction.Action.WITHDRAW);
@@ -154,11 +153,6 @@ public class TransactionServiceImpl implements TransactionService {
 	public Transaction update(Long id, Transaction newTransaction) {
 
 		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
@@ -195,62 +189,136 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void updateValue(Long id, BigDecimal value) {
+	public Transaction update(Long id, UpdateTransaction content) {
 		
 		Dashboard dashboard = headerRequest.getDashboard();
 
 		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
-
-		if (!entity.isAvailableToChange()) {
-			throw new InvalidOperationException(entity, entity.getStatus());
-		}
-
-		entity.setValue(value);
-
-		transactionRepository.save(entity);
-
-	}
-
-	@Override
-	public void updateCashier(Long id, Cashier cashier) {
 		
-		Dashboard dashboard = headerRequest.getDashboard();
-
-		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
-				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
-
+		if(!content.haveChanges()) {
+			return entity;
+		}
+		
 		if (!entity.isAvailableToChange()) {
 			throw new InvalidOperationException(entity, entity.getStatus());
 		}
+		
+		if(content.haveValue()) {
+			entity.setValue(content.getValue());
+		}
+		
+		if(content.haveCashier()) {
+			Cashier cashier = cashierService.findById(content.getCashier());
+			entity.setCashier(cashier);
+		}
+		
+		if(content.haveAssigned()) {
+			Long idAssigned = content.getAssigned();
+			Flatmate flatmateAssigned = flatmateService.findById(idAssigned)
+					.orElseThrow(() -> new EntityNotFoundException(Flatmate.class, idAssigned));
+			
+			Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
-		entity.setCashier(cashier);
+			if (!dashboard.isOwner(flatmateLogged)) {
+				throw new AccessDeniedException(localeService.getMessage("flatmate.access.field.denied", flatmateLogged.getNickname(), "assigned"));
+			}
 
-		transactionRepository.save(entity);
+			if (!entity.isCreateBy(flatmateLogged) && !entity.isAssignedTo(flatmateLogged)) {
+				throw new AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname()));
+			}
+			
+			entity.setAssigned(flatmateAssigned);
+		}
 
+		return transactionRepository.save(entity);
 	}
 
 	@Override
-	public void updateFlatmateAssigned(Long id, Flatmate flatmateAssigned) {
+	public Transaction updateValue(Long id, BigDecimal value) {
 		
 		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
+		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
+				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
+
+		if (!entity.isAvailableToChange()) {
+			throw new InvalidOperationException(entity, entity.getStatus());
+		} else if (!entity.isCreateBy(flatmateLogged) && !entity.isAssignedTo(flatmateLogged)) {
+			throw new org.springframework.security.access.AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname() ));
 		}
+
+		entity.setValue(value);
+
+		return transactionRepository.save(entity);
+
+	}
+
+	@Override
+	public Transaction updateCashier(Long id, Cashier cashier) {
+		
+		Dashboard dashboard = headerRequest.getDashboard();
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
 
 		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
 
 		if (!entity.isAvailableToChange()) {
 			throw new InvalidOperationException(entity, entity.getStatus());
+		} else if (!entity.isCreateBy(flatmateLogged) && !entity.isAssignedTo(flatmateLogged)) {
+			throw new org.springframework.security.access.AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname() ));
+		}
+
+		entity.setCashier(cashier);
+
+		return transactionRepository.save(entity);
+
+	}
+
+	@Override
+	public Transaction updateFlatmateAssigned(Long id, Flatmate flatmateAssigned) {
+		
+		Dashboard dashboard = headerRequest.getDashboard();
+		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
+
+		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
+				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
+
+		if (!entity.isAvailableToChange()) {
+			throw new InvalidOperationException(entity, entity.getStatus());
+		} else if (!entity.isCreateBy(flatmateLogged) && !entity.isAssignedTo(flatmateLogged)) {
+			throw new org.springframework.security.access.AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname() ));
 		}
 
 		entity.setAssigned(flatmateAssigned);
 
-		transactionRepository.save(entity);
+		return transactionRepository.save(entity);
 
+	}
+
+	@Override
+	public void delete(Long id) {
+
+		Dashboard dashboard = headerRequest.getDashboard();
+
+		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
+				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
+
+		dashboardService.removeTransaction(dashboard, entity);
+
+	}
+
+	@Override
+	public Collection<Transaction> findByFlatmateReferences(Flatmate createBy, Flatmate assigned) {
+		Dashboard dashboard = headerRequest.getDashboard();
+		return transactionRepository.findByDashboardAndFlatmateRef(dashboard, createBy, assigned);
+	}
+
+	@Override
+	public Collection<Transaction> findByCashierReferences(Cashier cashier) {
+		Dashboard dashboard = headerRequest.getDashboard();
+		return transactionRepository.findByDashboardAndCashier(dashboard, cashier);
 	}
 
 	@Override
@@ -269,20 +337,13 @@ public class TransactionServiceImpl implements TransactionService {
 			return transactionRepository.save(transaction);
 
 		} else {
-			throw new AccessDeniedException(flatmateLogged);
+			throw new AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname()));
 		}
 
 	}
 
 	@Override
 	public Transaction finish(Transaction transaction) {
-
-		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		if (transaction.isSended()) {
 
@@ -294,17 +355,11 @@ public class TransactionServiceImpl implements TransactionService {
 		} else {
 			throw new InvalidOperationException(transaction, transaction.getStatus());
 		}
+		
 	}
 
 	@Override
 	public Transaction cancel(Transaction transaction) {
-
-		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.isOwner(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		if (transaction.isSended()) {
 
@@ -334,35 +389,8 @@ public class TransactionServiceImpl implements TransactionService {
 			return transactionRepository.save(transaction);
 
 		} else {
-			throw new AccessDeniedException(flatmateLogged);
+			throw new AccessDeniedException(localeService.getMessage(LOCALE_KEY_ACCESS_DENIED, flatmateLogged.getNickname()));
 		}
-
-	}
-
-	@Override
-	public Collection<Transaction> findByFlatmateReferences(Dashboard dashboard, Flatmate createBy, Flatmate assigned) {
-		return transactionRepository.findByDashboardAndFlatmateRef(dashboard, createBy, assigned);
-	}
-
-	@Override
-	public Collection<Transaction> findByCashierReferences(Dashboard dashboard, Cashier cashier) {
-		return transactionRepository.findByDashboardAndCashier(dashboard, cashier);
-	}
-
-	@Override
-	public void delete(Long id) {
-
-		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.getOwner().equals(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
-
-		Transaction entity = transactionRepository.findByDashboardAndId(dashboard, id)
-				.orElseThrow(() -> new EntityNotFoundException(Transaction.class, id));
-
-		dashboardService.removeTransaction(dashboard, entity);
 
 	}
 

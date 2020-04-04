@@ -12,13 +12,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.service.AuthenticationFacade;
 import br.com.cashhouse.server.service.DashboardService;
+import br.com.cashhouse.server.service.LocaleService;
 
 public class HeaderRequestTest {
 	
@@ -34,6 +35,8 @@ public class HeaderRequestTest {
 	private AuthenticationFacade authenticationFacade; 
 	
 	private DashboardService dashboardService;
+	
+	private LocaleService localeService;
 
 	@Before
 	public void setup() {
@@ -43,8 +46,9 @@ public class HeaderRequestTest {
 		webRequest = Mockito.mock(ServletWebRequest.class);
 		authenticationFacade = Mockito.mock(AuthenticationFacade.class);
 		dashboardService = Mockito.mock(DashboardService.class);
+		localeService = Mockito.mock(LocaleService.class);
 		
-		resolver = new HeaderRequest(authenticationFacade, dashboardService);
+		resolver = new HeaderRequest(localeService, authenticationFacade, dashboardService);
 
 		when(webRequest.getNativeRequest()).thenReturn(request);
 		

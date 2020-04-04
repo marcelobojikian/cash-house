@@ -187,7 +187,7 @@ public class PutTest extends Oauth2 {
 	@Test
 	public void update_NotOwner_Dashboard_Forbidden_ADMIN() throws Exception {
 		
-		loginWith(MARCELO).dashboard(JEAN);
+		loginWith(GABI).dashboard(MARCELO);
 
 		// @formatter:off
 		body()

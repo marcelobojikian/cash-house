@@ -15,15 +15,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.service.DashboardService;
 import br.com.cashhouse.server.service.FlatmateService;
+import br.com.cashhouse.server.service.LocaleService;
 import br.com.cashhouse.server.spring.UserDetailsImpl;
 
 // https://github.com/spring-projects/spring-framework/blob/master/spring-webmvc/src/test/java/org/springframework/web/servlet/mvc/method/annotation/RequestResponseBodyMethodProcessorTests.java
@@ -38,6 +39,7 @@ public class DashboardArgumentResolverTest {
 	
 	private ServletWebRequest webRequest;
 	
+	private LocaleService localeService;
 	private FlatmateService flatmateService;
 	private DashboardService dashboardService;
 	
@@ -52,8 +54,9 @@ public class DashboardArgumentResolverTest {
 		webRequest = Mockito.mock(ServletWebRequest.class);
 		flatmateService = Mockito.mock(FlatmateService.class);
 		dashboardService = Mockito.mock(DashboardService.class);
+		localeService = Mockito.mock(LocaleService.class);
 		
-		resolver = new DashboardArgumentResolver(flatmateService, dashboardService);
+		resolver = new DashboardArgumentResolver(localeService, flatmateService, dashboardService);
 		
 		flatmate = createFlatmate(1l, "none", "none");
 

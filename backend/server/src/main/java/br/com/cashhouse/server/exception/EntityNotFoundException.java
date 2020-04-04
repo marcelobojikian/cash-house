@@ -4,16 +4,17 @@ import lombok.Getter;
 
 @Getter
 public class EntityNotFoundException extends RuntimeException {
-
+	
 	private static final long serialVersionUID = 1L;
 	
-	private Class<?> clazz;
-	private String field;
-	private Object id;
+	private final Class<?> clazz;
+	private final String field;
+	private final transient Object id;
 	
 	public EntityNotFoundException(Class<?> clazz, Object id) {
         super(String.format("%s %s not found", clazz.getSimpleName(), id));
         this.clazz = clazz;
+        this.field = null;
         this.id = id;
 	}
 	

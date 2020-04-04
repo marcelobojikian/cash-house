@@ -16,16 +16,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.repository.FlatmateRepository;
-import br.com.cashhouse.server.util.LoginWith;
+import br.com.cashhouse.server.util.annotation.LoginWith;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -46,13 +44,13 @@ public class UserServiceTest {
 	@MockBean
 	private FlatmateRepository flatmateRepository;
 
-	@TestConfiguration
-	static class UserServiceImplTestContextConfiguration {
-		@Bean
-		public UserService userService() {
-			return new UserServiceImpl();
-		}
-	}
+//	@TestConfiguration
+//	static class UserServiceImplTestContextConfiguration {
+//		@Bean
+//		public UserService userService() {
+//			return new UserServiceImpl();
+//		}
+//	}
 
 	@LoginWith(id = 1l)
 	@Test

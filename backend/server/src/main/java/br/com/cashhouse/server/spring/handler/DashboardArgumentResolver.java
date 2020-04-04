@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -15,9 +16,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.service.DashboardService;
 import br.com.cashhouse.server.service.FlatmateService;
+import br.com.cashhouse.server.service.LocaleService;
 
 @Component
 public class DashboardArgumentResolver implements HandlerMethodArgumentResolver {
@@ -28,8 +29,11 @@ public class DashboardArgumentResolver implements HandlerMethodArgumentResolver 
 
 	private FlatmateService flatmateService;
 	
+	private LocaleService localeService;
+	
 	@Autowired
-	public DashboardArgumentResolver(@Lazy FlatmateService flatmateService, @Lazy DashboardService dashboardService) {
+	public DashboardArgumentResolver(@Lazy LocaleService localeService, @Lazy FlatmateService flatmateService, @Lazy DashboardService dashboardService) {
+		this.localeService = localeService;
 		this.flatmateService = flatmateService;
 		this.dashboardService = dashboardService;
 	}
@@ -72,7 +76,7 @@ public class DashboardArgumentResolver implements HandlerMethodArgumentResolver 
 				|| dashboard.getGuests().contains(flatmate)) {
 			return dashboard;
 		} else {
-			throw new AccessDeniedException(flatmate);
+			throw new AccessDeniedException(localeService.getMessage("flatmate.access.denied", flatmate.getNickname()));
 		}
 		
 	}

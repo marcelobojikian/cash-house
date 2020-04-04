@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.model.Transaction.Status;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.exception.InvalidOperationException;
-import br.com.cashhouse.server.exception.NoContentException;
 import br.com.cashhouse.server.service.LocaleService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,36 +47,14 @@ public class RestExceptionHandler {
 
 	}
 
-	@ExceptionHandler(NoContentException.class)
-	public ResponseEntity<ErrorResponse> noContentException(NoContentException ex) {
-		String message = localeService.getMessage("body.no.content");
-		return buildResponse(message, HttpStatus.NO_CONTENT);
-	}
-
 	@ExceptionHandler(InvalidOperationException.class)
 	public ResponseEntity<ErrorResponse> invalidOperationException(InvalidOperationException ex) {
 
 		Transaction transaction = ex.getTransaction();
 		Status status = ex.getStatus();
-		String message = localeService.getMessage("Transaction.status.invalid.operation", transaction.getId(), status);;
+		String message = localeService.getMessage("Transaction.status.invalid.operation", transaction.getId(), status);
 
 		return buildResponse(message, HttpStatus.METHOD_NOT_ALLOWED);
-	}
-
-	@ExceptionHandler(AccessDeniedException.class)
-	public ResponseEntity<ErrorResponse> accessDeniedException(AccessDeniedException ex) {
-
-		String flatmateName = ex.getFlatmate().getNickname();
-		String fieldName = ex.getField();
-		String message = null;
-
-		if (fieldName == null) {
-			message = localeService.getMessage("flatmate.access.denied", flatmateName);
-		} else {
-			message = localeService.getMessage("flatmate.access.field.denied", flatmateName, fieldName);
-		}
-
-		return buildResponse(message, HttpStatus.FORBIDDEN);
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)
@@ -107,7 +83,7 @@ public class RestExceptionHandler {
 
 	private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {
 		ErrorResponse error = new ErrorResponse(request, status, message);
-		return new ResponseEntity<ErrorResponse>(error, status);
+		return new ResponseEntity<>(error, status);
 	}
 
 }

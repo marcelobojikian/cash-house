@@ -37,7 +37,6 @@ import br.com.cashhouse.core.model.Cashier;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
-import br.com.cashhouse.server.exception.NoContentException;
 import br.com.cashhouse.server.rest.dto.Content;
 import br.com.cashhouse.server.rest.dto.CreateTransaction;
 import br.com.cashhouse.server.rest.dto.UpdateTransaction;
@@ -63,7 +62,7 @@ public class TransactionController {
 
 	@GetMapping("")
 	@ApiOperation(value = "Return a list with all transactions", response = Transaction[].class)
-	public ResponseEntity<?> findAll(
+	public ResponseEntity<Object> findAll(
 			@ApiIgnore @QuerydslPredicate(root = Transaction.class) Predicate predicate, 
 			@ApiIgnore Pageable pageable,
 			@RequestParam(required = false, defaultValue = "none") String group) {
@@ -148,31 +147,16 @@ public class TransactionController {
 
 	@PatchMapping("/{id}")
 	@ApiOperation(value = "Return a transaction entity partial updated", response = Transaction.class)
-	public Transaction patch(
-			@PathVariable @NotNull Long id,
+	public ResponseEntity<Transaction> patch(@PathVariable @NotNull Long id,
 			@RequestBody @Valid UpdateTransaction content) {
 		
 		if(!content.haveChanges()) {
-			throw new NoContentException();
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 		
-		if(content.haveFlatmateAssigned()) {
-			Long flatmateId = content.getAssigned();
-			Flatmate flatmateAssigned = flatmateService.findById(flatmateId).orElseThrow(() -> new EntityNotFoundException(Flatmate.class, flatmateId));
-			transactionService.updateFlatmateAssigned(id, flatmateAssigned);
-		}
-		
-		if(content.changeCashier()) {
-			Long cashierId = content.getCashier();
-			Cashier cashier = cashierService.findById(cashierId);
-			transactionService.updateCashier(id, cashier);
-		}
-		
-		if(content.changeValue()) {
-			transactionService.updateValue(id, content.getValue());
-		}
-		
-		return transactionService.findById(id);
+		Transaction transaction = transactionService.update(id, content);
+
+		return new ResponseEntity<>(transaction, HttpStatus.OK);
 
 	}
 

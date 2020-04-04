@@ -67,7 +67,7 @@ public class FlatmateController {
 			nickname = email;
 		}
 		
-		return flatmateService.create(email, nickname, password);
+		return flatmateService.createGuest(email, nickname, password);
 
 	}
 
@@ -99,7 +99,7 @@ public class FlatmateController {
 	@ApiOperation(value = "Return status OK when deleted", response = Flatmate.class)
 	public void detele(
 			@PathVariable Long id){
-		flatmateService.delete(id);
+		flatmateService.deleteGuest(id);
 	}
 
 }

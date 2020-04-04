@@ -34,7 +34,7 @@ public class PostTest extends Oauth2 {
 
 		post("/flatmates")
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.email", is("newFlatmate@mail.com")))
 				.andExpect(jsonPath("$.nickname", is("New Flatmate")))
 				.andExpect(jsonPath("$.password").doesNotExist());
@@ -70,7 +70,7 @@ public class PostTest extends Oauth2 {
 
 		post("/flatmates")
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.email", is("newFlatmate@mail.com")))
 				.andExpect(jsonPath("$.nickname", is("newFlatmate@mail.com")))
 				.andExpect(jsonPath("$.password").doesNotExist());
