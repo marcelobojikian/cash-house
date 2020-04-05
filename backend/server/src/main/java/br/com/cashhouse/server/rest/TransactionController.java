@@ -39,6 +39,7 @@ import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.rest.dto.Content;
 import br.com.cashhouse.server.rest.dto.CreateTransaction;
+import br.com.cashhouse.server.rest.dto.EntityTransaction;
 import br.com.cashhouse.server.rest.dto.UpdateTransaction;
 import br.com.cashhouse.server.service.CashierService;
 import br.com.cashhouse.server.service.FlatmateService;
@@ -47,7 +48,7 @@ import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/transactions")
+@RequestMapping("/v1/transactions")
 @PreAuthorize("hasAnyRole('USER')")
 public class TransactionController {
 
@@ -141,8 +142,8 @@ public class TransactionController {
 	@ApiOperation(value = "Return a transaction entity updated", response = Transaction.class)
 	public Transaction update(
 			@PathVariable Long id, 
-			@RequestBody Transaction transaction) {
-		return transactionService.update(id, transaction);
+			@RequestBody EntityTransaction transaction) {
+		return transactionService.update(id, transaction.toEntity());
 	}
 
 	@PatchMapping("/{id}")

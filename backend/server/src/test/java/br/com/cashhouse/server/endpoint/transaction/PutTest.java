@@ -30,9 +30,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 2l)
+			.add("assigned", 2l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -57,9 +57,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 1l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 2l)
+			.add("assigned", 1l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -84,9 +84,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 1l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 1l)
+			.add("assigned", 2l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -111,9 +111,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 2l)
+			.add("assigned", 2l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -131,9 +131,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 3l)
+			.add("createBy", 2l)
+			.add("assigned", 2l)
+			.add("cashier", 3l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -151,9 +151,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 9l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 2l)
+			.add("assigned", 9l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -171,9 +171,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 9l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 9l)
+			.add("assigned", 2l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));
@@ -191,9 +191,9 @@ public class PutTest extends Oauth2 {
 
 		// @formatter:off
 		body()
-			.addParent("createBy", "id", 2l)
-			.addParent("assigned", "id", 2l)
-			.addParent("cashier", "id", 1l)
+			.add("createBy", 2l)
+			.add("assigned", 2l)
+			.add("cashier", 1l)
 			.add("status", "CREATED")
 			.add("action", "WITHDRAW")
 			.add("value", new BigDecimal("2.82"));

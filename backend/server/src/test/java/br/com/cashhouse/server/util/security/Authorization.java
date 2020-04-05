@@ -16,6 +16,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 public class Authorization {
+	
+	private static final String VERSION = "/v1";
 
 	private static final String CLIENT_ID = "cueva";
 	private static final String CLIENT_SECRET = "noop";
@@ -62,27 +64,27 @@ public class Authorization {
     }
 
 	public Authorization get(String url) {
-    	this.request = MockMvcRequestBuilders.get(url);
+    	this.request = MockMvcRequestBuilders.get(VERSION+url);
         return this;
     }
 
     public Authorization post(String url) {
-    	this.request = MockMvcRequestBuilders.post(url);
+    	this.request = MockMvcRequestBuilders.post(VERSION+url);
         return this;
     }
 
     public Authorization put(String url) {
-    	this.request = MockMvcRequestBuilders.put(url);
+    	this.request = MockMvcRequestBuilders.put(VERSION+url);
         return this;
     }
 
     public Authorization patch(String url) {
-    	this.request = MockMvcRequestBuilders.patch(url);
+    	this.request = MockMvcRequestBuilders.patch(VERSION+url);
         return this;
     }
 
     public Authorization delete(String url) {
-    	this.request = MockMvcRequestBuilders.delete(url);
+    	this.request = MockMvcRequestBuilders.delete(VERSION+url);
         return this;
     }
     

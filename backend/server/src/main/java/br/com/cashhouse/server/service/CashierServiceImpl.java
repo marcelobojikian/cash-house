@@ -78,6 +78,7 @@ public class CashierServiceImpl implements CashierService {
 		entity.setName(cashier.getName());
 		entity.setStarted(cashier.getStarted());
 		entity.setBalance(cashier.getBalance());
+		entity.setOwner(cashier.getOwner());
 
 		return cashierRepository.save(entity);
 

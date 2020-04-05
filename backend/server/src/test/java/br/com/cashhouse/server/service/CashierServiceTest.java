@@ -143,7 +143,7 @@ public class CashierServiceTest extends ServiceAuthHelper {
 		
 	}
 
-	@LoginWith(id = 1)
+	@LoginWith(roles = "ADMIN", id = 1)
 	@Test
 	public void whenUpdate_thenReturnCashierObject() throws Exception {
 		
@@ -165,7 +165,7 @@ public class CashierServiceTest extends ServiceAuthHelper {
 		
 	}
 
-	@LoginWith(id = 1)
+	@LoginWith(roles = "ADMIN", id = 1)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenUpdate_thenThrowEntityNotFoundException() throws Exception {
 		

@@ -26,40 +26,25 @@ import br.com.cashhouse.server.endpoint.Oauth2;
 public class PutTest extends Oauth2 {
 
 	@Test
-	public void guest_update_forbidden_NotOwner_Dashboard() throws Exception {
+	public void update_OK_ADMIN_Dashboard() throws Exception {
 		
-		loginWith(GRETCHEN).dashboard(JEAN);
-
-		// @formatter:off
-		body()
-			.add("name", "Change Name")
-			.add("started", new BigDecimal("9.88"))
-			.add("balance", new BigDecimal("1234.22"));
-				
-		put("/cashiers/3")
-				.andExpect(status().isForbidden());
-        // @formatter:on
-
-	}
-
-	@Test
-	public void update_OK_Owner_Dashboard() throws Exception {
-		
-		loginWith(JEAN);
+		loginWith(MARCELO);
 
 		// @formatter:off
 		body()
 			.add("name", "New Rent & Bills")
 			.add("started", new BigDecimal("0.50"))
-			.add("balance", new BigDecimal("32.99"));
+			.add("balance", new BigDecimal("32.99"))
+			.add("owner", "2");
 		
-		put("/cashiers/3")
+		put("/cashiers/1")
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(3)))
+				.andExpect(jsonPath("$.id", is(1)))
 				.andExpect(jsonPath("$.name", is("New Rent & Bills")))
 				.andExpect(jsonPath("$.started", is(0.50)))
-				.andExpect(jsonPath("$.balance", is(32.99)));
+				.andExpect(jsonPath("$.balance", is(32.99)))
+				.andExpect(jsonPath("$.owner.id", is(2)));
         // @formatter:on
 
 	}
@@ -67,13 +52,14 @@ public class PutTest extends Oauth2 {
 	@Test
 	public void update_invalid_id_NotFound() throws Exception {
 		
-		loginWith(JEAN);
+		loginWith(MARCELO);
 
 		// @formatter:off
 		body()
 			.add("name", "New Name")
 			.add("started", new BigDecimal("44.32"))
-			.add("balance", new BigDecimal("12.42"));
+			.add("balance", new BigDecimal("12.42"))
+			.add("owner", "2");
 		
 		put("/cashiers/999")
 				.andExpect(status().isNotFound());
@@ -84,13 +70,14 @@ public class PutTest extends Oauth2 {
 	@Test
 	public void guest_update_invalid_id_InOther_Dashboard() throws Exception {
 		
-		loginWith(GRETCHEN);
+		loginWith(MARCELO);
 
 		// @formatter:off
 		body()
 			.add("name", "New Name")
 			.add("started", new BigDecimal("44.32"))
-			.add("balance", new BigDecimal("12.42"));
+			.add("balance", new BigDecimal("12.42"))
+			.add("owner", "2");
 		
 		put("/cashiers/3")
 				.andExpect(status().isNotFound());
