@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.server.rest.dto.Propertie;
+import br.com.cashhouse.server.service.AuthenticationFacade;
 import br.com.cashhouse.server.service.UserService;
 import br.com.cashhouse.server.service.interceptor.HeaderRequest;
-import br.com.cashhouse.server.spring.annotation.UserLogged;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/users/self")
@@ -31,12 +30,15 @@ public class UserController {
 	private HeaderRequest headerRequest;
 
 	@Autowired
+	private AuthenticationFacade authenticationFacade; 
+
+	@Autowired
 	private UserService userService;
 
 	@GetMapping("/detail")
 	@ApiOperation(value = "Return a user details entity", response = Flatmate.class)
-	public Flatmate getDetails(@ApiIgnore @UserLogged Flatmate flatmate) {
-		return flatmate;
+	public Flatmate getDetails() {
+		return authenticationFacade.getFlatmateLogged();
 	}
 
 	@GetMapping("/dashboard")
@@ -59,8 +61,7 @@ public class UserController {
 
 	@PutMapping("/password")
 	@ApiOperation(value = "Return a flatmate entity with update password", response = Flatmate.class)
-	public Flatmate updatePassword(@ApiIgnore @UserLogged Flatmate flatmate,
-			@RequestBody @Valid Propertie propertie) {
+	public Flatmate updatePassword(@RequestBody @Valid Propertie propertie) {
 		return userService.changePassword(propertie.getValue());
 	}
 

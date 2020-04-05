@@ -10,7 +10,7 @@ import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.repository.FlatmateRepository;
 
-@Service
+@Service("userService")
 public class UserServiceImpl implements UserService {
 
 	@Autowired

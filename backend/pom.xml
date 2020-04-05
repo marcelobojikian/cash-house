@@ -9,6 +9,8 @@
 		<version>2.1.2.RELEASE</version>
         <relativePath/>
 	</parent>
+	
+	<!-- APPLY https://spring.io/guides/tutorials/bookmarks/ -->
 
 	<groupId>br.com.cashhouse</groupId>
 	<artifactId>backend</artifactId>

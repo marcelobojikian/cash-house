@@ -9,8 +9,8 @@ public class InvalidOperationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Transaction transaction;
-	private Status status;
+	private final Transaction transaction;
+	private final Status status;
 	
 	public InvalidOperationException(Transaction transaction, Status status) {
         super(String.format("Invalid operation, Transaction %s with status equal to %s", transaction.getId(), status));

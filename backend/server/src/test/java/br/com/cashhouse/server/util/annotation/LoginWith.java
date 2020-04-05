@@ -1,12 +1,14 @@
-package br.com.cashhouse.server.util;
+package br.com.cashhouse.server.util.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 
+import br.com.cashhouse.server.util.security.LoginWithContextFactory;
+
 @Retention(RetentionPolicy.RUNTIME)
-@WithSecurityContext(factory = LoginSecurityContextFactory.class)
+@WithSecurityContext(factory = LoginWithContextFactory.class)
 public @interface LoginWith {
 
 	long id() default -1l;

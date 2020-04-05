@@ -36,7 +36,7 @@ public class PostTest extends Oauth2 {
 
 		post("/cashiers")
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.name", is("Post Test Cashier")))
 				.andExpect(jsonPath("$.started", is(11.23)))
 				.andExpect(jsonPath("$.balance",is(123.23)));
@@ -124,7 +124,7 @@ public class PostTest extends Oauth2 {
 
 		post("/cashiers")
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.name", is("Post Test Cashier")))
 				.andExpect(jsonPath("$.started", is(198.44)))
 				.andExpect(jsonPath("$.balance",is(198.44)));

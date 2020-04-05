@@ -2,9 +2,12 @@ package br.com.cashhouse.server.service;
 
 import java.util.Collection;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import br.com.cashhouse.core.model.Dashboard;
 import br.com.cashhouse.core.model.Flatmate;
 
+@PreAuthorize("isAuthenticated()")
 public interface UserService {
 
 	public Collection<Dashboard> findInvitations();

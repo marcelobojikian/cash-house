@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.cashhouse.core.model.Cashier;
@@ -35,14 +36,12 @@ import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.model.Transaction.Action;
 import br.com.cashhouse.core.repository.CashierRepository;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
-import br.com.cashhouse.server.service.interceptor.HeaderRequest;
-import br.com.cashhouse.server.util.security.LoginWithAdmin;
+import br.com.cashhouse.server.util.annotation.LoginWith;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CashierServiceTest {
+public class CashierServiceTest extends ServiceAuthHelper {
 
 	@Autowired
 	private CashierService cashierService;
@@ -56,12 +55,6 @@ public class CashierServiceTest {
 	@MockBean
 	private TransactionService transactionService;
 
-	@MockBean
-	private AuthenticationFacade authenticationFacade;
-	
-	@MockBean
-	private HeaderRequest headerRequest;
-
 	@TestConfiguration
 	static class CashierServiceImplTestContextConfiguration {
 		@Bean
@@ -70,15 +63,15 @@ public class CashierServiceTest {
 		}
 	}
 
+	@LoginWith(id = 1)
 	@Test
 	public void whenFindById_thenReturnCashierObject() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 		
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		
 		Cashier cashierExpect = cashierService.findById(1L);
@@ -90,45 +83,44 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 1)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenFindById_thenThrowEntityNotFoundException() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
 		cashierService.findById(1L);
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenFindAll_thenReturnObjectArray() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 		
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 		Cashier garbage = createCashier(dashboard, 2l, "Garbage", 4.2, 56.6);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
         List<Cashier> cashiers = cashierService.findAll();
 
         assertThat(cashiers, contains(energy, garbage));
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenCreate_thenReturnCashierObject() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
 		Cashier cashier = cashierService.create("Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
@@ -140,35 +132,27 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 2)
 	@Test(expected = AccessDeniedException.class)
 	public void whenCreate_thenThrowAccessDeniedException() throws Exception {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
-		Dashboard dashboard = flatmate.getDashboard();
-
-		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
-
-		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
-
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
-		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
+		userDashboard(flatmate);
 		
 		cashierService.create("Energy", BigDecimal.valueOf(12.3), BigDecimal.valueOf(12.3));
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenUpdate_thenReturnCashierObject() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 		Cashier energyNew = createCashier(dashboard, 1l, "Energy UP", 3.1, 3.2);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		when(cashierRepository.save(energy)).thenReturn(energy);
 		
@@ -181,16 +165,15 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 1)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenUpdate_thenThrowEntityNotFoundException() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 99l)).thenReturn(Optional.empty());
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
@@ -198,34 +181,32 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 2)
 	@Test(expected = AccessDeniedException.class)
 	public void whenUpdate_thenThrowAccessDeniedException() throws Exception {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		userDashboard(flatmate);
+		
 		Dashboard dashboard = flatmate.getDashboard();
-
-		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
 		cashierService.update(1l, energy);
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenUpdateName_thenReturnCashierObject() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
 		when(cashierRepository.save(energy)).thenReturn(energy);
 		
@@ -238,51 +219,47 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 1)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenUpdateName_thenThrowEntityNotFoundException() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 99l)).thenReturn(Optional.empty());
 		
 		cashierService.update(99l, "Energy UP");
 		
 	}
 
+	@LoginWith(id = 2)
 	@Test(expected = AccessDeniedException.class)
 	public void whenUpdateName_thenThrowAccessDeniedException() throws Exception {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		userDashboard(flatmate);
+		
 		Dashboard dashboard = flatmate.getDashboard();
-
-		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
 		when(cashierRepository.save(any(Cashier.class))).thenReturn(energy);
 		
 		cashierService.update(1l, "Energy UP");
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
-	@LoginWithAdmin
 	public void whenDelete_thenReturnVoid() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.of(energy));
-		when(transactionService.findByCashierReferences(eq(dashboard), any(Cashier.class))).thenReturn(new ArrayList<Transaction>());
+		when(transactionService.findByCashierReferences(any(Cashier.class))).thenReturn(new ArrayList<Transaction>());
 		doNothing().when(dashboardService).removeCashier(eq(dashboard), any(Cashier.class));
 		doNothing().when(dashboardService).removeTransactions(eq(dashboard), anyCollection());
 		
@@ -293,41 +270,35 @@ public class CashierServiceTest {
 		
 	}
 
+	@LoginWith(id = 1)
 	@Test(expected = EntityNotFoundException.class)
-	@LoginWithAdmin
 	public void whenDelete_thenThrowEntityNotFoundException() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(flatmate);
 		when(cashierRepository.findByDashboardAndId(dashboard, 1l)).thenReturn(Optional.empty());
 		
 		cashierService.delete(1l);
 		
 	}
 
+	@LoginWith(id = 2)
 	@Test(expected = AccessDeniedException.class)
-	@LoginWithAdmin
 	public void whenDelete_thenThrowAccessDeniedException() throws Exception {
 		
 		Flatmate flatmate = createFlatmate(1l, "none", "none");
-		Dashboard dashboard = flatmate.getDashboard();
-
-		Flatmate notDashboarOwner = createFlatmate(2l, "not owner", "not owner");
-
-		when(headerRequest.getDashboard()).thenReturn(dashboard);
-		when(authenticationFacade.getFlatmateLogged()).thenReturn(notDashboarOwner);
+		userDashboard(flatmate);
 		
 		cashierService.delete(1l);
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenApplyTransactionDeposit_thenReturnVoid() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
@@ -345,11 +316,12 @@ public class CashierServiceTest {
 		verify(cashierRepository, times(1)).save(any(Cashier.class));
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test
 	public void whenApplyTransactionWithdraw_thenReturnVoid() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);
@@ -367,11 +339,12 @@ public class CashierServiceTest {
 		verify(cashierRepository, times(1)).save(any(Cashier.class));
 		
 	}
-	
+
+	@LoginWith(id = 1)
 	@Test(expected = EntityNotFoundException.class)
 	public void whenApplyTransaction_thenReturnVoid() throws Exception {
 		
-		Flatmate flatmate = createFlatmate(1l, "none", "none");
+		Flatmate flatmate = getFlatmateLogged();
 		Dashboard dashboard = flatmate.getDashboard();
 
 		Cashier energy = createCashier(dashboard, 1l, "Energy", 12.3);

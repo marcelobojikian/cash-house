@@ -14,7 +14,6 @@ import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.model.Transaction.Action;
 import br.com.cashhouse.core.repository.CashierRepository;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -54,14 +53,12 @@ public class CashierServiceImpl implements CashierService {
 		
 		Dashboard dashboard = headerRequest.getDashboard();
 		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if(!dashboard.getOwner().equals(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
-
+		
 		Cashier cashier = new Cashier(name, started, balance);
 		cashier.setOwner(flatmateLogged);
 		dashboard.getCashiers().add(cashier);
+
+		log.info(String.format("Flatmate %s creating Cashier %s", flatmateLogged.getNickname(), name));
 		
 		return cashierRepository.save(cashier);
 		
@@ -71,14 +68,12 @@ public class CashierServiceImpl implements CashierService {
 	public Cashier update(long id, Cashier cashier) {
 
 		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.getOwner().equals(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		Cashier entity = cashierRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Cashier.class, id));
+		
+		log.info(String.format("Cashier %s changing ... ", entity.getName()));
+		log.info(String.format("Name[%s], Started[%s], Balance[%s]", cashier.getName(), cashier.getStarted(), cashier.getBalance()));
 
 		entity.setName(cashier.getName());
 		entity.setStarted(cashier.getStarted());
@@ -92,14 +87,11 @@ public class CashierServiceImpl implements CashierService {
 	public Cashier update(long id, String name) {
 
 		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.getOwner().equals(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		Cashier entity = cashierRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Cashier.class, id));
+		
+		log.info(String.format("Cashier %s change name to %s", entity.getName(), name));
 
 		entity.setName(name);
 
@@ -112,19 +104,18 @@ public class CashierServiceImpl implements CashierService {
 	public void delete(long id) {
 
 		Dashboard dashboard = headerRequest.getDashboard();
-		Flatmate flatmateLogged = authenticationFacade.getFlatmateLogged();
-
-		if (!dashboard.getOwner().equals(flatmateLogged)) {
-			throw new AccessDeniedException(flatmateLogged);
-		}
 
 		Cashier entity = cashierRepository.findByDashboardAndId(dashboard, id)
 				.orElseThrow(() -> new EntityNotFoundException(Cashier.class, id));
+		
+		log.info(String.format("Deleting Cashier %s", entity.getName()));
 
-		Collection<Transaction> transactions = transactionService.findByCashierReferences(dashboard, entity);
+		Collection<Transaction> transactions = transactionService.findByCashierReferences(entity);
 
 		dashboardService.removeCashier(dashboard, entity);
 		dashboardService.removeTransactions(dashboard, transactions);
+		
+		log.info("Delete sucess");
 
 	}
 
@@ -142,7 +133,7 @@ public class CashierServiceImpl implements CashierService {
 			cashier.deposit(transaction.getValue());
 		}
 		
-		log.info(String.format("Changed balance by %s", cashier.getBalance()));
+		log.info(String.format("Apply %s. Changed balance to %s", transaction.getValue(), cashier.getBalance()));
 		
 		cashierRepository.save(cashier);
 		

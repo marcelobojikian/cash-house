@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,13 +37,11 @@ import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.core.model.Transaction;
 import br.com.cashhouse.core.model.Transaction.Action;
 import br.com.cashhouse.core.model.Transaction.Status;
-import br.com.cashhouse.server.exception.AccessDeniedException;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.exception.InvalidOperationException;
-import br.com.cashhouse.server.exception.NoContentException;
 import br.com.cashhouse.server.service.LocaleService;
 import br.com.cashhouse.server.util.ContentHelper;
-import br.com.cashhouse.server.util.security.LoginWithAdmin;
+import br.com.cashhouse.server.util.annotation.LoginWith;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,11 +61,9 @@ public class RestExceptionHandlerTest {
 
 	@MockBean
 	private LocaleService localeService;
-	
-//	private Transaction transaction;
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
 	public void should_throw_MethodArgumentNotValidException() throws Exception {
 		
 		ContentHelper content = ContentHelper.generate();
@@ -89,24 +86,19 @@ public class RestExceptionHandlerTest {
 		
 	}
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
 	public void should_throw_NoContentException() throws Exception {
 		
 		when(localeService.getMessage("body.no.content")).thenReturn("Body of request is invalid");
 		
 		mockMvc.perform(get("/exception/no_content"))
-			      	.andExpect(status().isNoContent())
-					.andExpect(jsonPath("$.status", is(HttpStatus.NO_CONTENT.value())))
-					.andExpect(jsonPath("$.error", is(HttpStatus.NO_CONTENT.getReasonPhrase())))
-					.andExpect(jsonPath("$.message", is("Body of request is invalid")))
-					.andExpect(jsonPath("$.path", is("/exception/no_content")))
-					.andExpect(jsonPath("$.timestamp", notNullValue()));
+			      	.andExpect(status().isNoContent());
 		
 	}
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
 	public void should_throw_InvalidOperationException() throws Exception {
 
 		when(localeService.getMessage("Transaction.status.invalid.operation", 1l, Status.SENDED)).thenReturn("Invalid operation, Transaction 1 with status equal to SENDED");
@@ -121,40 +113,8 @@ public class RestExceptionHandlerTest {
 		
 	}
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
-	public void should_throw_AccessDeniedException() throws Exception {
-
-		when(localeService.getMessage(eq("flatmate.access.denied"), eq("Marcelo"))).thenReturn("Flatmate Marcelo does not have permissions for the resource");
-		
-		mockMvc.perform(get("/exception/access_denied/name"))
-			      	.andExpect(status().isForbidden())
-					.andExpect(jsonPath("$.status", is(HttpStatus.FORBIDDEN.value())))
-					.andExpect(jsonPath("$.error", is(HttpStatus.FORBIDDEN.getReasonPhrase())))
-					.andExpect(jsonPath("$.message", is("Flatmate Marcelo does not have permissions for the resource")))
-					.andExpect(jsonPath("$.path", is("/exception/access_denied/name")))
-					.andExpect(jsonPath("$.timestamp", notNullValue()));
-		
-	}
-
-	@Test
-	@LoginWithAdmin
-	public void should_throw_AccessDeniedException_Filed() throws Exception {
-
-		when(localeService.getMessage(eq("flatmate.access.field.denied"), eq("Marcelo"), eq("password"))).thenReturn("Flatmate Marcelo does not have permissions for field password");
-		
-		mockMvc.perform(get("/exception/access_denied/name_field"))
-			      	.andExpect(status().isForbidden())
-					.andExpect(jsonPath("$.status", is(HttpStatus.FORBIDDEN.value())))
-					.andExpect(jsonPath("$.error", is(HttpStatus.FORBIDDEN.getReasonPhrase())))
-					.andExpect(jsonPath("$.message", is("Flatmate Marcelo does not have permissions for field password")))
-					.andExpect(jsonPath("$.path", is("/exception/access_denied/name_field")))
-					.andExpect(jsonPath("$.timestamp", notNullValue()));
-		
-	}
-
-	@Test
-	@LoginWithAdmin
 	public void should_throw_EntityNotFoundException_Class() throws Exception {
 
 		when(localeService.getMessage(eq("Flatmate.not.found"), eq(1l))).thenReturn("Flatmate 1 not found");
@@ -169,8 +129,8 @@ public class RestExceptionHandlerTest {
 		
 	}
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
 	public void should_throw_EntityNotFoundException_Class_Field() throws Exception {
 
 		when(localeService.getMessage(eq("Transaction.cashier.not.found"), eq(1l))).thenReturn("Transaction cashier 1 not found");
@@ -185,8 +145,8 @@ public class RestExceptionHandlerTest {
 		
 	}
 
+	@LoginWith(roles = "ADMIN")
 	@Test
-	@LoginWithAdmin
 	public void should_throw_SpringAccessDeniedException() throws Exception {
 
 		mockMvc.perform(get("/exception/spring/access_denied"))
@@ -207,26 +167,14 @@ public class RestExceptionHandlerTest {
 		public void throwMethodArgumentNotValidException(@RequestBody @Valid SimpleBean propertie) throws Exception {}
 	
 		@GetMapping("/no_content")
-		public void throwNoContentException() throws Exception {
-			throw new NoContentException();
+		public ResponseEntity<Object> throwNoContentException() throws Exception {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	
 		@GetMapping("/transaction_invalid/status")
 		public ResponseEntity<?> throwInvalidOperationException() throws Exception {
 			Transaction transaction = createTransaction(1l, 2.33, Status.SENDED, Action.WITHDRAW);
 			throw new InvalidOperationException(transaction, transaction.getStatus());
-		}
-	
-		@GetMapping("/access_denied/name")
-		public ResponseEntity<?> throwAccessDeniedException_Name() throws Exception {
-			Flatmate flatmate = createFlatmate(1l, "none", "Marcelo");
-			throw new AccessDeniedException(flatmate);
-		}
-	
-		@GetMapping("/access_denied/name_field")
-		public ResponseEntity<?> throwAccessDeniedException_Name_Field() throws Exception {
-			Flatmate flatmate = createFlatmate(1l, "none", "Marcelo");
-			throw new AccessDeniedException(flatmate, "password");
 		}
 	
 		@GetMapping("/not_found/class")
@@ -241,7 +189,7 @@ public class RestExceptionHandlerTest {
 	
 		@GetMapping("/spring/access_denied")
 		public ResponseEntity<?> throwSpringAccessDeniedException() throws Exception {
-			throw new org.springframework.security.access.AccessDeniedException("Spring AccessDeniedException");
+			throw new AccessDeniedException("Spring AccessDeniedException");
 		}
 		
 	}

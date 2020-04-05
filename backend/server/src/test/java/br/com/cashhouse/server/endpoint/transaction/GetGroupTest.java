@@ -1,6 +1,8 @@
 package br.com.cashhouse.server.endpoint.transaction;
 
 import static br.com.cashhouse.server.util.security.SecurityAccess.User.*;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -31,19 +33,19 @@ public class GetGroupTest extends Oauth2 {
 		// @formatter:off
 		get("/transactions?group=createdDate")
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.content", hasSize(2)))
+			.andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(2))))
 			.andExpect(jsonPath("$.content[0].createdDate", is("2020-01-28")))
 			.andExpect(jsonPath("$.content[0].year", is(2020)))
 			.andExpect(jsonPath("$.content[0].month", is(1)))
 			.andExpect(jsonPath("$.content[0].day", is(28)))
-			.andExpect(jsonPath("$.content[0].data", hasSize(3)))
-	        .andExpect(jsonPath("$.content[0].data[*].id", contains(1,3,6)))
+			.andExpect(jsonPath("$.content[0].data", hasSize(greaterThanOrEqualTo(3))))
+	        .andExpect(jsonPath("$.content[0].data[*].id", hasItems(1,3,6)))
 			.andExpect(jsonPath("$.content[1].createdDate", is("2020-01-27")))
 			.andExpect(jsonPath("$.content[1].year", is(2020)))
 			.andExpect(jsonPath("$.content[1].month", is(1)))
 			.andExpect(jsonPath("$.content[1].day", is(27)))
-			.andExpect(jsonPath("$.content[1].data", hasSize(2)))
-	        .andExpect(jsonPath("$.content[1].data[*].id", contains(2,5)));
+			.andExpect(jsonPath("$.content[1].data", hasSize(greaterThanOrEqualTo(2))))
+	        .andExpect(jsonPath("$.content[1].data[*].id", hasItems(2,5)));
         // @formatter:on
 
 	}

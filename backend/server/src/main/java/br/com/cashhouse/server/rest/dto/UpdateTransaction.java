@@ -21,20 +21,20 @@ public class UpdateTransaction {
 	@Digits(integer = 10, fraction = 2)
     private BigDecimal value;
 	
-	public boolean haveFlatmateAssigned() {
-		return assigned != null;
+	public boolean haveChanges() {
+		return assigned != null || cashier != null || value != null;
 	}
 	
-	public boolean changeCashier() {
-		return cashier != null;
-	}
-	
-	public boolean changeValue() {
+	public boolean haveValue() {
 		return value != null;
 	}
 	
-	public boolean haveChanges() {
-		return assigned != null || cashier != null || value != null;
+	public boolean haveCashier() {
+		return cashier != null;
+	}
+	
+	public boolean haveAssigned() {
+		return assigned != null;
 	}
 
 }

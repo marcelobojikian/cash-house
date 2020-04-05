@@ -133,7 +133,7 @@ public class PostDepositTest extends Oauth2 {
 		
 		post(URL)
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.createBy.id", is(8)))
 				.andExpect(jsonPath("$.assigned.id", is(8)))
 				.andExpect(jsonPath("$.cashier.id", is(3)))
@@ -157,7 +157,7 @@ public class PostDepositTest extends Oauth2 {
 		
 		post(URL)
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.createBy.id", is(8)))
 				.andExpect(jsonPath("$.assigned.id", is(9)))
 				.andExpect(jsonPath("$.cashier.id", is(3)))
@@ -180,7 +180,7 @@ public class PostDepositTest extends Oauth2 {
 		
 		post(URL)
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id", is(11)))
+				.andExpect(jsonPath("$.id", is(1001)))
 				.andExpect(jsonPath("$.createBy.id", is(9)))
 				.andExpect(jsonPath("$.assigned.id", is(9)))
 				.andExpect(jsonPath("$.cashier.id", is(3)))
