@@ -18,7 +18,7 @@ public interface CashierService {
 	@PreAuthorize("isDashboardOwner()")
 	public Cashier create(String name, BigDecimal startedValue, BigDecimal balance);
 
-	@PreAuthorize("isDashboardOwner()")
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	public Cashier update(long id, Cashier cashier);
 
 	@PreAuthorize("isDashboardOwner()")

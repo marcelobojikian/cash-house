@@ -23,12 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.cashhouse.core.model.Flatmate;
 import br.com.cashhouse.server.exception.EntityNotFoundException;
 import br.com.cashhouse.server.rest.dto.CreateFlatmate;
+import br.com.cashhouse.server.rest.dto.EntityFlatmate;
 import br.com.cashhouse.server.rest.dto.UpdateFlatmate;
 import br.com.cashhouse.server.service.FlatmateService;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/flatmates")
+@RequestMapping("/v1/flatmates")
 @PreAuthorize("hasAnyRole('USER')")
 public class FlatmateController {
 
@@ -73,8 +74,8 @@ public class FlatmateController {
 
 	@PutMapping("/{id}")
 	@ApiOperation(value = "Return a flatmate entity updated", response = Flatmate.class)
-	public Flatmate update(@PathVariable Long id, @RequestBody Flatmate flatmate) {
-		return flatmateService.update(id, flatmate);
+	public Flatmate update(@PathVariable Long id, @RequestBody @Valid EntityFlatmate flatmate) {
+		return flatmateService.update(id, flatmate.toEntity());
 	}
 
 	@PatchMapping("/{id}")

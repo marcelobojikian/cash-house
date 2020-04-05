@@ -14,7 +14,7 @@ import br.com.cashhouse.server.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/transactions/{id}")
+@RequestMapping("/v1/transactions/{id}")
 @PreAuthorize("hasAnyRole('USER')")
 public class TransactionActionController {
 

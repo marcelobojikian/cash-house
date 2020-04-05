@@ -8,7 +8,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.cashhouse.core.model.Cashier;
 import br.com.cashhouse.server.rest.dto.CreateCashier;
+import br.com.cashhouse.server.rest.dto.EntityCashier;
 import br.com.cashhouse.server.rest.dto.UpdateCashier;
 import br.com.cashhouse.server.service.CashierService;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/cashiers")
-@PreAuthorize("hasAnyRole('USER')")
+@RequestMapping("/v1/cashiers")
 public class CashierController {
 
 	@Autowired
@@ -75,8 +74,8 @@ public class CashierController {
 	@ApiOperation(value = "Return a cashier entity updated", response = Cashier.class)
 	public Cashier update(
 			@PathVariable Long id, 
-			@RequestBody Cashier cashier) {
-		return cashierService.update(id, cashier);
+			@RequestBody @Valid EntityCashier cashier) {
+		return cashierService.update(id, cashier.toEntity());
 	}
 
 	@PatchMapping("/{id}")

@@ -22,7 +22,7 @@ import br.com.cashhouse.server.service.interceptor.HeaderRequest;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/users/self")
+@RequestMapping("/v1/users/self")
 @PreAuthorize("hasAnyRole('USER')")
 public class UserController {
 

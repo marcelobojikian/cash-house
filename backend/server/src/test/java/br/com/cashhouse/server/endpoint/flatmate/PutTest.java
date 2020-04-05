@@ -32,10 +32,14 @@ public class PutTest extends Oauth2 {
 		body()
 			.add("email", "update@mail.com")
 			.add("nickname", "Flatmate updated")
-			.add("password", "test");
+			.add("password", "test")
+			.add("roles", "OTHER")
+			.add("enabled", "false")
+			.add("firstStep", "true")
+			.add("guestStep", "true")
+			.add("dashboard", "2");
 
 		put("/flatmates/8")
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().isForbidden());
         // @formatter:on
 
@@ -51,10 +55,11 @@ public class PutTest extends Oauth2 {
 			.add("email", "carol2@mail.com")
 			.add("nickname", "Carol (test UPDATE)")
 			.add("password", "test")
-			.add("roles", "USER")
-			.add("enabled", "true")
+			.add("roles", "OTHER")
+			.add("enabled", "false")
 			.add("firstStep", "true")
-			.add("guestStep", "true");
+			.add("guestStep", "true")
+			.add("dashboard", "2");
 		
 		put("/flatmates/6")
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -62,7 +67,12 @@ public class PutTest extends Oauth2 {
 				.andExpect(jsonPath("$.id", is(6)))
 				.andExpect(jsonPath("$.email", is("carol2@mail.com")))
 				.andExpect(jsonPath("$.nickname", is("Carol (test UPDATE)")))
-				.andExpect(jsonPath("$.password").doesNotExist());
+				.andExpect(jsonPath("$.password").doesNotExist())
+				.andExpect(jsonPath("$.roles").doesNotExist())
+				.andExpect(jsonPath("$.enabled", is(false)))
+				.andExpect(jsonPath("$.firstStep", is(true)))
+				.andExpect(jsonPath("$.guestStep", is(true)))
+				.andExpect(jsonPath("$.dashboard").doesNotExist());
         // @formatter:on
 
 	}
@@ -80,7 +90,8 @@ public class PutTest extends Oauth2 {
 			.add("roles", "USER")
 			.add("enabled", "true")
 			.add("firstStep", "true")
-			.add("guestStep", "true");
+			.add("guestStep", "true")
+			.add("dashboard", "2");
 		
 		put("/flatmates/999")
 				.andExpect(status().isNotFound());
